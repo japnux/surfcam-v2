@@ -108,7 +108,7 @@ export default async function TestSpotPage({ params }: TestSpotPageProps) {
               <h2 className="text-2xl font-semibold">Conditions actuelles</h2>
               <ConditionsBanner
                 current={current}
-                tideHeight={currentTideHeight}
+                tideHeight={currentTideHeight ?? 0}
                 nextTides={nextTides}
               />
             </div>
