@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
+import type { Spot } from './spots'
 
-export async function getUserFavorites(userId: string) {
+export async function getUserFavorites(userId: string): Promise<Spot[]> {
   const supabase = await createClient()
   
   const { data, error } = await supabase
@@ -10,7 +11,7 @@ export async function getUserFavorites(userId: string) {
     .order('created_at', { ascending: false })
   
   if (error) throw error
-  return data.map(f => f.spots).filter(Boolean)
+  return data.map((f: any) => f.spots).filter(Boolean) as Spot[]
 }
 
 export async function getUserFavoriteIds(userId: string) {
