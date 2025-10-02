@@ -69,13 +69,19 @@ export function ShareButton({ spotName, spotUrl }: ShareButtonProps) {
     setIsSharing(true)
 
     try {
-      console.log('[ShareButton] Starting share...')
-      const imageBlob = await captureVideoFrame()
-      console.log('[ShareButton] Image captured:', imageBlob ? 'success' : 'failed')
+      // Try to capture image, but don't fail if CORS blocks it
+      let imageBlob: Blob | null = null
+      try {
+        imageBlob = await captureVideoFrame()
+        console.log('[ShareButton] Image captured successfully')
+      } catch (captureError) {
+        console.warn('[ShareButton] Image capture failed (likely CORS):', captureError)
+        // Continue without image
+      }
       
       const shareData: ShareData = {
         title: `${spotName} - Surf Webcam`,
-        text: `Découvre les conditions actuelles à ${spotName}`,
+        text: `Yo ! On va surfer ou quoi ? Découvre les conditions actuelles à ${spotName}`,
         url: spotUrl,
       }
 
@@ -96,14 +102,14 @@ export function ShareButton({ spotName, spotUrl }: ShareButtonProps) {
 
       // Use Web Share API if available
       if (typeof navigator !== 'undefined' && navigator.share) {
-        console.log('[ShareButton] Using Web Share API with data:', shareData)
         await navigator.share(shareData)
         toast({
           title: 'Partagé !',
-          description: 'Le spot a été partagé avec succès',
+          description: imageBlob 
+            ? 'Le spot a été partagé avec succès' 
+            : 'Le spot a été partagé (sans image)',
         })
       } else {
-        console.log('[ShareButton] Using fallback share method')
         // Fallback: download image and copy URL
         if (imageBlob) {
           const url = URL.createObjectURL(imageBlob)
@@ -112,21 +118,27 @@ export function ShareButton({ spotName, spotUrl }: ShareButtonProps) {
           a.download = `${spotName.toLowerCase().replace(/\s+/g, '-')}.jpg`
           a.click()
           URL.revokeObjectURL(url)
+          
+          await navigator.clipboard.writeText(spotUrl)
+          toast({
+            title: 'Image téléchargée',
+            description: 'Le lien a été copié dans le presse-papier',
+          })
+        } else {
+          // No image, just copy URL
+          await navigator.clipboard.writeText(spotUrl)
+          toast({
+            title: 'Lien copié',
+            description: 'Le lien du spot a été copié dans le presse-papier',
+          })
         }
-        
-        // Copy URL to clipboard
-        await navigator.clipboard.writeText(spotUrl)
-        toast({
-          title: 'Image téléchargée',
-          description: 'Le lien a été copié dans le presse-papier',
-        })
       }
     } catch (error) {
       console.error('[ShareButton] Share error:', error)
       if ((error as Error).name !== 'AbortError') {
         toast({
           title: 'Erreur',
-          description: `Impossible de partager le spot: ${(error as Error).message}`,
+          description: 'Impossible de partager le spot',
           variant: 'destructive',
         })
       }
