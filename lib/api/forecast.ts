@@ -78,16 +78,6 @@ export async function getForecast(
     marineRes.json(),
   ])
 
-  // Debug logging
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Open-Meteo Wind Data (first 3 hours):', {
-      time: weatherData.hourly.time.slice(0, 3),
-      windSpeed: weatherData.hourly.wind_speed_10m.slice(0, 3),
-      windGust: weatherData.hourly.wind_gusts_10m.slice(0, 3),
-      windDirection: weatherData.hourly.wind_direction_10m.slice(0, 3),
-    })
-  }
-
   // Normalize the data
   const hourly: HourlyForecast[] = []
   const length = weatherData.hourly.time.length

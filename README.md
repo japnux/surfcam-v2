@@ -4,11 +4,18 @@ A modern, responsive web application for viewing live surf webcams and detailed 
 
 ## 🌊 Features
 
-- **Live Webcams**: View real-time surf conditions from multiple spots
-- **Detailed Forecasts**: Hourly forecasts for 7 days with wind, waves, tides, and weather
+- **Live Webcams**: View real-time surf conditions from multiple spots with HLS streaming
+- **Detailed Forecasts**: Hourly forecasts for 48h with wind, waves, swell, tides, and weather
+- **Dual Forecast Sources**: 
+  - Open-Meteo (free) for all spots
+  - Stormglass (premium) for selected spots with daily forecast limit
+- **Smart Sharing**: Share spot with webcam snapshot and conditions to friends
+  - Native share on mobile (Web Share API)
+  - Automatic image capture from video stream
+  - Fallback to clipboard + download on desktop
 - **User Favorites**: Save your favorite spots (requires authentication)
 - **Magic Link Auth**: Secure, passwordless authentication via email
-- **Admin Panel**: CRUD operations for managing spots
+- **Admin Panel**: CRUD operations for managing spots with forecast source toggle
 - **SEO Optimized**: Complete metadata, OG images, sitemaps, and structured data
 - **Responsive Design**: Mobile-first, works on all devices
 - **French Language**: All content in French
@@ -19,9 +26,12 @@ A modern, responsive web application for viewing live surf webcams and detailed 
 - **Styling**: TailwindCSS + shadcn/ui components
 - **Database**: Supabase (PostgreSQL with RLS)
 - **Authentication**: Supabase Auth (Magic Links)
-- **Forecasts**: Open-Meteo API (weather + marine data)
-- **Video**: Native HTML5 video with lazy-loaded HLS.js
-- **Deployment**: Vercel (with ISR)
+- **Forecasts**: 
+  - Open-Meteo API (free weather + marine data)
+  - Stormglass API (premium with caching for 10 calls/day limit)
+- **Video**: Native HTML5 video with lazy-loaded HLS.js + CORS support
+- **Sharing**: Web Share API with canvas-based video capture
+- **Deployment**: Vercel (with ISR + 15min cache)
 
 ## 📋 Prerequisites
 
@@ -68,12 +78,15 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 # Site
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_SITE_URL=http://localhost:3000  # Production: https://your-domain.com
 NEXT_PUBLIC_SITE_NAME="GoSurf Webcams"
 
-# APIs (defaults are fine)
-OPEN_METEO_WEATHER_URL=https://api.open-meteo.com/v1/forecast
-OPEN_METEO_MARINE_URL=https://marine-api.open-meteo.com/v1/marine
+# APIs
+OPEN_METEO_WEATHER_URL=https://api.open-meteo.com/v1/forecast  # Optional, has default
+OPEN_METEO_MARINE_URL=https://marine-api.open-meteo.com/v1/marine  # Optional, has default
+
+# Stormglass API (Optional - for premium spots)
+STORMGLASS_API_KEY=  # Get from stormglass.io (free tier: 10 calls/day)
 
 # Cache (900 = 15 minutes)
 FORECAST_CACHE_TTL=900
@@ -189,10 +202,37 @@ Edit `app/globals.css` to customize the design system (colors, spacing, etc.)
 
 ## 📊 Forecasts & Tides
 
-- **Source**: Open-Meteo (free, no API key required)
-- **Data**: Wind, waves, swell, temperature, precipitation, pressure, UV
-- **Caching**: 15 minutes server-side (configurable)
-- **Tides**: Simplified sinusoidal calculation (replace with real API in production)
+### Forecast Sources
+
+The app supports **dual forecast sources** with automatic fallback:
+
+1. **Open-Meteo** (default, free):
+   - No API key required
+   - Data: Wind, waves, swell, temperature, precipitation, pressure, UV
+   - Updates: Hourly for 7 days
+   - Uses primary swell data (most relevant for surfing)
+
+2. **Stormglass** (premium, optional):
+   - API key required (free tier: 10 calls/day)
+   - Enable per-spot in admin panel (`has_daily_forecast` toggle)
+   - Cached for 24h to respect daily limits
+   - Fallbacks to Open-Meteo if quota exceeded
+
+### Data Processing
+
+- **Caching**: 15 minutes server-side (configurable via `FORECAST_CACHE_TTL`)
+- **Filtering**: Only shows forecasts from current hour onwards
+- **Swell**: Uses primary swell data (swell_wave_height) instead of total wave height
+- **Tides**: Calculated from Open-Meteo tide data
+
+### Sharing Feature
+
+- **Video Capture**: Captures current video frame via HTML5 canvas
+- **CORS Handling**: Gracefully falls back to text-only share if video capture blocked
+- **Share Methods**:
+  - Mobile: Native Web Share API with image + text + URL
+  - Desktop: Downloads image + copies URL to clipboard
+- **Custom Text**: "Yo ! On va surfer ou quoi ? Découvre les conditions actuelles à [Spot Name]"
 
 ## 🔧 Admin Features
 

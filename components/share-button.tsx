@@ -78,10 +78,9 @@ export function ShareButton({ spotName, spotSlug }: ShareButtonProps) {
       let imageBlob: Blob | null = null
       try {
         imageBlob = await captureVideoFrame()
-        console.log('[ShareButton] Image captured successfully')
       } catch (captureError) {
-        console.warn('[ShareButton] Image capture failed (likely CORS):', captureError)
-        // Continue without image
+        // Continue without image if CORS blocks capture
+        console.warn('Image capture failed, sharing without image')
       }
       
       const shareData: ShareData = {
@@ -98,10 +97,9 @@ export function ShareButton({ spotName, spotSlug }: ShareButtonProps) {
         try {
           if (navigator.canShare({ files: [file] })) {
             shareData.files = [file]
-            console.log('[ShareButton] Image added to share data')
           }
         } catch (e) {
-          console.warn('[ShareButton] canShare with files not supported:', e)
+          // File sharing not supported on this device
         }
       }
 
@@ -139,7 +137,7 @@ export function ShareButton({ spotName, spotSlug }: ShareButtonProps) {
         }
       }
     } catch (error) {
-      console.error('[ShareButton] Share error:', error)
+      // User cancelled share or other error
       if ((error as Error).name !== 'AbortError') {
         toast({
           title: 'Erreur',
