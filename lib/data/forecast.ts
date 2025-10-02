@@ -1,6 +1,6 @@
 import { Spot } from './spots'
 import { getStormglassForecastCached } from '@/lib/api/stormglass-cache'
-import { getForecast as getOpenMeteoForecast } from '@/lib/api/forecast'
+import { getForecast as getOpenMeteoForecast, ForecastData as OpenMeteoForecastData, HourlyForecast } from '@/lib/api/forecast'
 
 export interface ForecastData {
   forecast: any[]
@@ -10,6 +10,14 @@ export interface ForecastData {
     fromCache?: boolean
     callsRemaining?: number
     cached_at?: string
+  }
+}
+
+export interface UnifiedForecastData extends OpenMeteoForecastData {
+  meta: {
+    source: 'stormglass' | 'open-meteo'
+    fromCache?: boolean
+    callsRemaining?: number
   }
 }
 
@@ -85,4 +93,80 @@ export function shouldUseStormglass(spot: Spot): boolean {
  */
 export function getForecastSourceName(source: 'stormglass' | 'open-meteo'): string {
   return source === 'stormglass' ? 'Stormglass (Premium)' : 'Open-Meteo'
+}
+
+/**
+ * Get unified forecast data for display (compatible with existing components)
+ * Automatically chooses Stormglass or Open-Meteo and converts to unified format
+ */
+export async function getUnifiedForecast(spot: Spot): Promise<UnifiedForecastData> {
+  // If spot has daily forecast enabled, try Stormglass first
+  if (spot.has_daily_forecast) {
+    try {
+      console.log(`🎯 Attempting Stormglass for spot: ${spot.name}`)
+      
+      const result = await getStormglassForecastCached(
+        spot.id,
+        spot.latitude,
+        spot.longitude
+      )
+
+      if (result) {
+        console.log(`✅ Stormglass data ${result.fromCache ? 'from cache' : 'fresh'} for: ${spot.name}`)
+        
+        // Convert Stormglass format to OpenMeteo format
+        const hourly: HourlyForecast[] = result.data.forecast.map((item: any) => ({
+          time: item.time,
+          windSpeed: item.windSpeed?.sg || item.windSpeed || 0,
+          windGust: item.gust?.sg || item.gust || 0,
+          windDirection: item.windDirection?.sg || item.windDirection || 0,
+          airTemp: item.airTemperature?.sg || item.airTemperature || 0,
+          waterTemp: item.waterTemperature?.sg || item.waterTemperature || 0,
+          waveHeight: item.waveHeight?.sg || item.waveHeight || 0,
+          wavePeriod: item.wavePeriod?.sg || item.wavePeriod || 0,
+          waveDirection: item.waveDirection?.sg || item.waveDirection || 0,
+          secondaryWaveHeight: item.secondarySwellHeight?.sg || item.secondarySwellHeight || null,
+          secondaryWavePeriod: item.secondarySwellPeriod?.sg || item.secondarySwellPeriod || null,
+          secondaryWaveDirection: item.secondarySwellDirection?.sg || item.secondarySwellDirection || null,
+          precipitation: item.precipitation?.sg || item.precipitation || 0,
+          pressure: item.pressure?.sg || item.pressure || 0,
+          uvIndex: item.uvIndex?.sg || item.uvIndex || 0,
+        }))
+
+        return {
+          hourly,
+          daily: [], // Stormglass doesn't provide daily data, keep empty
+          meta: {
+            source: 'stormglass',
+            fromCache: result.fromCache,
+            callsRemaining: result.callsRemaining,
+          },
+        }
+      }
+
+      console.warn(`⚠️ Stormglass unavailable for ${spot.name}, falling back to Open-Meteo`)
+    } catch (error) {
+      console.error(`❌ Stormglass error for ${spot.name}:`, error)
+    }
+  }
+
+  // Fallback to Open-Meteo
+  console.log(`🌤️ Using Open-Meteo for spot: ${spot.name}`)
+  
+  try {
+    const openMeteoData = await getOpenMeteoForecast(
+      spot.latitude,
+      spot.longitude
+    )
+
+    return {
+      ...openMeteoData,
+      meta: {
+        source: 'open-meteo',
+      },
+    }
+  } catch (error) {
+    console.error(`❌ Open-Meteo error for ${spot.name}:`, error)
+    throw new Error('Failed to fetch forecast from any source')
+  }
 }

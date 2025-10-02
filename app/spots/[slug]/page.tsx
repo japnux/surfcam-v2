@@ -1,8 +1,9 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getSpotBySlug, getActiveSpots } from '@/lib/data/spots'
-import { getForecast, getCurrentConditions } from '@/lib/api/forecast'
+import { getCurrentConditions } from '@/lib/api/forecast'
 import { getTides, getNextTideEvents, getCurrentTideHeight } from '@/lib/api/tides'
+import { getUnifiedForecast, getForecastSourceName } from '@/lib/data/forecast'
 import { isFavorite } from '@/lib/data/favorites'
 import { createClient } from '@/lib/supabase/server'
 import { VideoPlayer } from '@/components/video-player'
@@ -73,14 +74,17 @@ export default async function SpotPage({ params }: SpotPageProps) {
   }
 
   // Fetch forecast and tides data
-  const [forecast, tides] = await Promise.all([
-    getForecast(spot.latitude, spot.longitude),
+  const [forecastData, tides] = await Promise.all([
+    getUnifiedForecast(spot),
     getTides(spot.latitude, spot.longitude),
   ])
 
-  const current = getCurrentConditions(forecast)
+  const current = getCurrentConditions(forecastData)
   const nextTides = getNextTideEvents(tides, 2)
   const currentTideHeight = getCurrentTideHeight(tides)
+  
+  // Get forecast source for display
+  const forecastSource = getForecastSourceName(forecastData.meta.source)
 
   // Check if user is logged in and if spot is favorited
   const supabase = await createClient()
@@ -208,10 +212,16 @@ export default async function SpotPage({ params }: SpotPageProps) {
 
         {/* Forecast Table */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold">Prévisions horaires (48h)</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">Prévisions horaires (48h)</h2>
+            <span className="text-sm text-muted-foreground">
+              Source: {forecastSource}
+              {forecastData.meta.fromCache && ' (cache)'}
+            </span>
+          </div>
           <div className="bg-card border border-border rounded-lg overflow-hidden">
             <ForecastTable
-              hourly={forecast.hourly}
+              hourly={forecastData.hourly}
               hourlyTides={tides.hourly}
               hoursToShow={48}
             />
