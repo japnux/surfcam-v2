@@ -1,6 +1,6 @@
 import { Spot } from './spots'
 import { getStormglassForecastCached } from '@/lib/api/stormglass-cache'
-import { getForecast as getOpenMeteoForecast, ForecastData as OpenMeteoForecastData, HourlyForecast } from '@/lib/api/forecast'
+import { getForecast as getOpenMeteoForecast, ForecastData as OpenMeteoForecastData, HourlyForecast, DailyData } from '@/lib/api/forecast'
 
 export interface ForecastData {
   forecast: any[]
@@ -136,7 +136,7 @@ export async function getUnifiedForecast(spot: Spot): Promise<UnifiedForecastDat
         }))
 
         // Fetch sunrise/sunset from Open-Meteo (Stormglass doesn't provide it)
-        let daily = []
+        let daily: DailyData[] = []
         try {
           const openMeteoData = await getOpenMeteoForecast(spot.latitude, spot.longitude)
           daily = openMeteoData.daily
