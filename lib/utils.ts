@@ -18,7 +18,7 @@ export function getDirectionName(degrees: number): string {
 }
 
 export function formatDirection(degrees: number): string {
-  return `${getWindDirectionArrow(degrees)} ${getDirectionName(degrees)} (${Math.round(degrees)}°)`
+  return `${getDirectionName(degrees)} (${Math.round(degrees)}°)`
 }
 
 export function getSwellDirectionArrow(degrees: number): string {
