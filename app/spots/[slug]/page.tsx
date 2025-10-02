@@ -262,7 +262,7 @@ export default async function SpotPage({ params }: SpotPageProps) {
         )}
 
         {/* Tide Chart */}
-        <TideChart tides={tides} hours={12} />
+        <TideChart tides={tides} sunData={forecastData.daily[0]} hours={12} />
 
         {/* Forecast Table */}
         <div className="space-y-4">
