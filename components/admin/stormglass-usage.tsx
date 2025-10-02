@@ -82,7 +82,7 @@ export function StormglassUsage() {
           {/* Progress bar */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Utilisé aujourd'hui</span>
+              <span className="text-muted-foreground">Utilisé aujourd&apos;hui</span>
               <span className={`font-semibold ${getStatusColor()}`}>
                 {stats.used} / {stats.limit}
               </span>
@@ -126,7 +126,7 @@ export function StormglassUsage() {
                 <p className="text-red-600 dark:text-red-500 mt-1">
                   {stats.remaining === 0 
                     ? "Vous avez atteint la limite quotidienne. Les spots utilisent maintenant Open-Meteo."
-                    : `Plus que ${stats.remaining} appels disponibles aujourd'hui.`
+                    : `Plus que ${stats.remaining} appels disponibles aujourd&apos;hui.`
                   }
                 </p>
               </div>
