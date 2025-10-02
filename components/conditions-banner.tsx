@@ -44,7 +44,7 @@ export function ConditionsBanner({ current, tideHeight, nextTides }: ConditionsB
           <div className="flex-1 min-w-0">
             <div className="text-xs font-medium text-muted-foreground mb-1.5">VAGUES</div>
             <div className="text-3xl font-bold text-blue-500 mb-1 flex items-center gap-2">
-              <span>{getWindDirectionArrow(current.waveDirection)}</span>
+              <span className="font-mono" style={{ fontVariantEmoji: 'text' }}>{getWindDirectionArrow(current.waveDirection)}</span>
               <span>{formatWaveHeight(current.waveHeight)} - {formatPeriod(current.wavePeriod)}</span>
             </div>
             <div className="space-y-0.5 text-sm">
@@ -76,12 +76,12 @@ export function ConditionsBanner({ current, tideHeight, nextTides }: ConditionsB
           <div className="flex-1 min-w-0">
             <div className="text-xs font-medium text-muted-foreground mb-1.5">VENT</div>
             <div className="text-3xl font-bold text-green-500 mb-1 flex items-center gap-2">
-              <span>{getWindDirectionArrow(current.windDirection)}</span>
+              <span className="font-mono" style={{ fontVariantEmoji: 'text' }}>{getWindDirectionArrow(current.windDirection)}</span>
               <span>{formatWindSpeed(current.windSpeed)}</span>
             </div>
             <div className="space-y-0.5 text-sm">
               <div className="text-muted-foreground">
-                <span className="font-medium">Rafales:</span> {formatWindSpeed(current.windGust)}
+                <span className="font-medium">Raf:</span> {formatWindSpeed(current.windGust)}
               </div>
               <div className="text-muted-foreground font-mono text-xs truncate">
                 {formatDirection(current.windDirection)}

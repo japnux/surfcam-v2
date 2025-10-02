@@ -72,18 +72,18 @@ export function ForecastTable({ hourly, hoursToShow = 48 }: ForecastTableProps) 
                 {/* Vent: direction + force + rafales */}
                 <td className="p-3">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-lg">{getWindDirectionArrow(hour.windDirection)}</span>
+                    <span className="font-mono text-lg" style={{ fontVariantEmoji: 'text' }}>{getWindDirectionArrow(hour.windDirection)}</span>
                     <span className="font-semibold">{formatWindSpeed(hour.windSpeed)}</span>
                   </div>
                   <div className="text-xs text-muted-foreground mt-0.5">
-                    Rafales: {formatWindSpeed(hour.windGust)}
+                    Raf: {formatWindSpeed(hour.windGust)}
                   </div>
                 </td>
                 
                 {/* Vagues: direction + taille + période */}
                 <td className="p-3">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-lg">{getWindDirectionArrow(hour.waveDirection)}</span>
+                    <span className="font-mono text-lg" style={{ fontVariantEmoji: 'text' }}>{getWindDirectionArrow(hour.waveDirection)}</span>
                     <span className="font-semibold text-blue-500">
                       {formatWaveHeight(hour.waveHeight)} - {formatPeriod(hour.wavePeriod)}
                     </span>
