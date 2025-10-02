@@ -14,7 +14,13 @@ interface ForecastTableProps {
 }
 
 export function ForecastTable({ hourly, hoursToShow = 48 }: ForecastTableProps) {
-  const displayData = hourly.slice(0, hoursToShow)
+  // Obtenir l'heure courante arrondie à l'heure inférieure
+  const now = new Date()
+  now.setMinutes(0, 0, 0) // Arrondir à l'heure inférieure
+  
+  // Filtrer les prévisions pour ne garder que celles >= à l'heure courante
+  const futureForecasts = hourly.filter(hour => new Date(hour.time) >= now)
+  const displayData = futureForecasts.slice(0, hoursToShow)
 
   return (
     <div className="overflow-x-auto">

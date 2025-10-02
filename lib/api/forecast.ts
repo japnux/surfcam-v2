@@ -55,9 +55,6 @@ export async function getForecast(
     latitude: latitude.toString(),
     longitude: longitude.toString(),
     hourly: [
-      'wave_height',
-      'wave_period',
-      'wave_direction',
       'swell_wave_height',
       'swell_wave_period',
       'swell_wave_direction',
@@ -81,6 +78,16 @@ export async function getForecast(
     marineRes.json(),
   ])
 
+  // Debug logging
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Open-Meteo Wind Data (first 3 hours):', {
+      time: weatherData.hourly.time.slice(0, 3),
+      windSpeed: weatherData.hourly.wind_speed_10m.slice(0, 3),
+      windGust: weatherData.hourly.wind_gusts_10m.slice(0, 3),
+      windDirection: weatherData.hourly.wind_direction_10m.slice(0, 3),
+    })
+  }
+
   // Normalize the data
   const hourly: HourlyForecast[] = []
   const length = weatherData.hourly.time.length
@@ -93,12 +100,14 @@ export async function getForecast(
       windDirection: weatherData.hourly.wind_direction_10m[i] || 0,
       airTemp: weatherData.hourly.temperature_2m[i] || 0,
       waterTemp: marineData.hourly.sea_surface_temperature[i] || 0,
-      waveHeight: marineData.hourly.wave_height[i] || 0,
-      wavePeriod: marineData.hourly.wave_period[i] || 0,
-      waveDirection: marineData.hourly.wave_direction[i] || 0,
-      secondaryWaveHeight: marineData.hourly.swell_wave_height?.[i] || null,
-      secondaryWavePeriod: marineData.hourly.swell_wave_period?.[i] || null,
-      secondaryWaveDirection: marineData.hourly.swell_wave_direction?.[i] || null,
+      // Use primary swell data (more relevant for surf than total wave height)
+      waveHeight: marineData.hourly.swell_wave_height[i] || 0,
+      wavePeriod: marineData.hourly.swell_wave_period[i] || 0,
+      waveDirection: marineData.hourly.swell_wave_direction[i] || 0,
+      // Open-Meteo doesn't provide secondary swell in free tier
+      secondaryWaveHeight: null,
+      secondaryWavePeriod: null,
+      secondaryWaveDirection: null,
       precipitation: weatherData.hourly.precipitation[i] || 0,
       pressure: weatherData.hourly.surface_pressure[i] || 0,
       uvIndex: weatherData.hourly.uv_index[i] || 0,
