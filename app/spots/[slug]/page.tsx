@@ -11,6 +11,7 @@ import { ConditionsBanner } from '@/components/conditions-banner'
 import { TideChart } from '@/components/tide-chart'
 import { ForecastTable } from '@/components/forecast-table'
 import { FavoriteButton } from '@/components/favorite-button'
+import { ShareButton } from '@/components/share-button'
 import { config } from '@/lib/config'
 import { MapPin, Info } from 'lucide-react'
 
@@ -140,13 +141,19 @@ export default async function SpotPage({ params }: SpotPageProps) {
               <span>{spot.city || spot.region}, {spot.country}</span>
             </div>
           </div>
-          {user && (
-            <FavoriteButton
-              spotId={spot.id}
+          <div className="flex items-center gap-2">
+            <ShareButton
               spotName={spot.name}
-              initialIsFavorite={userFavorite}
+              spotUrl={`${config.siteUrl}/spots/${spot.slug}`}
             />
-          )}
+            {user && (
+              <FavoriteButton
+                spotId={spot.id}
+                spotName={spot.name}
+                initialIsFavorite={userFavorite}
+              />
+            )}
+          </div>
         </div>
 
         {/* Video Player */}
