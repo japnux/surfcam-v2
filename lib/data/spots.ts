@@ -54,14 +54,10 @@ export async function searchSpots(query: string) {
   const supabase = await createClient()
   
   const { data, error } = await supabase
-    .from('spots')
-    .select('*')
-    .eq('is_active', true)
-    .or(`name.ilike.%${query}%,city.ilike.%${query}%`)
-    .order('name')
+    .rpc('search_spots_unaccent', { search_query: query })
   
   if (error) throw error
-  return data
+  return data as Spot[]
 }
 
 export async function createSpot(spot: SpotInsert) {

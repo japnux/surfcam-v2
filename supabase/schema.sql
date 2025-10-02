@@ -1,5 +1,6 @@
--- Enable UUID extension
+-- Enable extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "unaccent";
 
 -- Profiles table
 CREATE TABLE IF NOT EXISTS profiles (
@@ -133,3 +134,16 @@ CREATE TRIGGER update_spots_updated_at
   BEFORE UPDATE ON spots
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
+
+-- Function to search spots with accent-insensitive search
+CREATE OR REPLACE FUNCTION search_spots_unaccent(search_query TEXT)
+RETURNS SETOF spots AS $$
+BEGIN
+  RETURN QUERY
+  SELECT *
+  FROM spots
+  WHERE unaccent(name) ILIKE unaccent('%' || search_query || '%')
+     OR unaccent(city) ILIKE unaccent('%' || search_query || '%')
+  ORDER BY name;
+END;
+$$ LANGUAGE plpgsql;

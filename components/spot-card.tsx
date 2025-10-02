@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Spot } from '@/lib/data/spots'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { MapPin, Activity } from 'lucide-react'
+import { Activity } from 'lucide-react'
 
 interface SpotCardProps {
   spot: Spot
@@ -20,10 +20,6 @@ export function SpotCard({ spot }: SpotCardProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-2 text-sm">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <MapPin className="h-4 w-4" />
-              <span>{spot.city || spot.region}</span>
-            </div>
             {spot.break_type && (
               <div className="flex items-center gap-2">
                 <span className="inline-block px-2 py-1 bg-secondary text-secondary-foreground rounded-md text-xs">

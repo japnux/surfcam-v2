@@ -5,8 +5,8 @@ import { createClient } from '@/lib/supabase/server'
 import { isAdmin } from '@/lib/auth/admin'
 import { getAllSpots } from '@/lib/data/spots'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus, Edit, Trash2, Eye, TestTube } from 'lucide-react'
+import { Plus } from 'lucide-react'
+import { AdminSpotsList } from '@/components/admin/admin-spots-list'
 
 export const metadata: Metadata = {
   title: 'Administration',
@@ -41,62 +41,7 @@ export default async function AdminPage() {
         </Button>
       </div>
 
-      <div className="grid gap-4">
-        {spots.map((spot) => (
-          <Card key={spot.id}>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span>{spot.name}</span>
-                  {!spot.is_active && (
-                    <span className="text-xs px-2 py-1 bg-destructive/20 text-destructive rounded">
-                      Inactif
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="icon" asChild>
-                    <Link href={`/spots/${spot.slug}`} target="_blank">
-                      <Eye className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                  <Button variant="ghost" size="icon" asChild>
-                    <Link href={`/admin/spots/${spot.id}/test`}>
-                      <TestTube className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                  <Button variant="ghost" size="icon" asChild>
-                    <Link href={`/admin/spots/${spot.id}/edit`}>
-                      <Edit className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                  <Button variant="ghost" size="icon" asChild>
-                    <Link href={`/admin/spots/${spot.id}/delete`}>
-                      <Trash2 className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Région:</span> {spot.region}
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Ville:</span> {spot.city || '-'}
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Type:</span> {spot.cam_type}
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Slug:</span> {spot.slug}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <AdminSpotsList spots={spots} />
     </div>
   )
 }

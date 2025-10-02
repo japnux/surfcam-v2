@@ -1,14 +1,21 @@
 import { createClient } from '@/lib/supabase/server'
 import type { Spot } from './spots'
 
-export async function getUserFavorites(userId: string): Promise<Spot[]> {
+export async function getUserFavorites(userId: string, activeOnly: boolean = false): Promise<Spot[]> {
   const supabase = await createClient()
   
-  const { data, error } = await supabase
+  let query = supabase
     .from('favorites')
     .select('spot_id, spots(*)')
     .eq('user_id', userId)
-    .order('created_at', { ascending: false })
+  
+  if (activeOnly) {
+    query = query.eq('spots.is_active', true)
+  }
+  
+  query = query.order('created_at', { ascending: false })
+  
+  const { data, error } = await query
   
   if (error) throw error
   return data.map((f: any) => f.spots).filter(Boolean) as Spot[]

@@ -1,8 +1,10 @@
 import { Metadata } from 'next'
-import { getActiveSpots } from '@/lib/data/spots'
+import { getActiveSpots, type Spot } from '@/lib/data/spots'
+import { getUserFavorites } from '@/lib/data/favorites'
 import { SpotCard } from '@/components/spot-card'
 import { SearchBar } from '@/components/search-bar'
 import { config } from '@/lib/config'
+import { createClient } from '@/lib/supabase/server'
 
 export const metadata: Metadata = {
   title: 'Accueil',
@@ -12,7 +14,16 @@ export const metadata: Metadata = {
 export const revalidate = 900 // 15 minutes
 
 export default async function HomePage() {
-  const spots = await getActiveSpots(config.homeSpotCount)
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  let favoriteSpots: Spot[] = []
+  const activeSpots: Spot[] = await getActiveSpots(config.homeSpotCount)
+  
+  if (user) {
+    // Si l'utilisateur est connecté, récupérer ses favoris actifs
+    favoriteSpots = await getUserFavorites(user.id, true)
+  }
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -52,17 +63,29 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Spots Grid */}
+        {/* Mes spots favoris */}
+        {user && favoriteSpots.length > 0 && (
+          <section className="space-y-4">
+            <h2 className="text-2xl font-bold">Mes spots favoris</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {favoriteSpots.map((spot) => (
+                <SpotCard key={spot.id} spot={spot} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Tous les spots actifs */}
         <section className="space-y-4">
           <h2 className="text-2xl font-bold">Spots actifs</h2>
           
-          {spots.length === 0 ? (
+          {activeSpots.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <p>Aucun spot disponible pour le moment.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {spots.map((spot) => (
+              {activeSpots.map((spot) => (
                 <SpotCard key={spot.id} spot={spot} />
               ))}
             </div>
