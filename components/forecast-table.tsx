@@ -14,12 +14,13 @@ interface ForecastTableProps {
 }
 
 export function ForecastTable({ hourly, hoursToShow = 48 }: ForecastTableProps) {
-  // Obtenir l'heure courante arrondie à l'heure inférieure
+  // Obtenir l'heure courante arrondie à l'heure inférieure (en utilisant le timestamp pour éviter les problèmes de fuseau horaire)
   const now = new Date()
   now.setMinutes(0, 0, 0) // Arrondir à l'heure inférieure
+  const nowTimestamp = now.getTime()
   
   // Filtrer les prévisions pour ne garder que celles >= à l'heure courante
-  const futureForecasts = hourly.filter(hour => new Date(hour.time) >= now)
+  const futureForecasts = hourly.filter(hour => new Date(hour.time).getTime() >= nowTimestamp)
   const displayData = futureForecasts.slice(0, hoursToShow)
 
   return (
