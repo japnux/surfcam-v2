@@ -153,14 +153,17 @@ export function ShareButton({ spotName, spotSlug }: ShareButtonProps) {
   }
 
   return (
-    <Button
-      onClick={handleShare}
-      disabled={isSharing}
-      variant="outline"
-      size="icon"
-      aria-label="Partager ce spot"
-    >
-      <Share2 className="h-4 w-4" />
-    </Button>
+    <div className="flex justify-center">
+      <Button
+        onClick={handleShare}
+        disabled={isSharing}
+        variant="outline"
+        size="lg"
+        className="gap-2"
+      >
+        <Share2 className="h-5 w-5" />
+        Partage l'image du spot à tes potes
+      </Button>
+    </div>
   )
 }

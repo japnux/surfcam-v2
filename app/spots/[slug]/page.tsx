@@ -141,19 +141,13 @@ export default async function SpotPage({ params }: SpotPageProps) {
               <span>{spot.city || spot.region}, {spot.country}</span>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <ShareButton
+          {user && (
+            <FavoriteButton
+              spotId={spot.id}
               spotName={spot.name}
-              spotSlug={spot.slug}
+              initialIsFavorite={userFavorite}
             />
-            {user && (
-              <FavoriteButton
-                spotId={spot.id}
-                spotName={spot.name}
-                initialIsFavorite={userFavorite}
-              />
-            )}
-          </div>
+          )}
         </div>
 
         {/* Video Player */}
@@ -161,6 +155,12 @@ export default async function SpotPage({ params }: SpotPageProps) {
           src={spot.cam_url}
           type={spot.cam_type}
           spotName={spot.name}
+        />
+
+        {/* Share Button */}
+        <ShareButton
+          spotName={spot.name}
+          spotSlug={spot.slug}
         />
 
         {/* Spot Info */}
