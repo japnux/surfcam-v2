@@ -68,7 +68,74 @@ export function TideChart({ tides, sunData, hours = 12 }: TideChartProps) {
     <div className="bg-card border border-border rounded-lg p-6 shadow-lg">
       <h2 className="text-2xl font-bold mb-4">Marées</h2>
       
-      <div className="relative w-full" style={{ height: `${svgHeight + 60}px` }}>
+      <div className="relative w-full" style={{ height: `${svgHeight + 110}px` }}>
+        {/* Sun times markers - above the chart */}
+        <div className="relative w-full" style={{ height: '40px', marginBottom: '10px' }}>
+          {/* Sunrise marker */}
+          {sunData?.sunrise && (() => {
+            const sunriseTime = new Date(sunData.sunrise)
+            const timeFromStart = sunriseTime.getTime() - startTime
+            const positionPercent = (timeFromStart / timeRange) * 100
+            
+            if (positionPercent >= 0 && positionPercent <= 100) {
+              return (
+                <div
+                  key="sunrise-top"
+                  className="absolute"
+                  style={{ 
+                    left: `${positionPercent}%`,
+                    transform: 'translateX(-50%)',
+                    top: 0
+                  }}
+                >
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="text-xs font-semibold text-center text-orange-500 whitespace-nowrap">
+                      {sunriseTime.toLocaleTimeString('fr-FR', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </div>
+                    <Sunrise className="h-4 w-4 text-orange-500 mx-auto mt-1" />
+                  </div>
+                </div>
+              )
+            }
+            return null
+          })()}
+          
+          {/* Sunset marker */}
+          {sunData?.sunset && (() => {
+            const sunsetTime = new Date(sunData.sunset)
+            const timeFromStart = sunsetTime.getTime() - startTime
+            const positionPercent = (timeFromStart / timeRange) * 100
+            
+            if (positionPercent >= 0 && positionPercent <= 100) {
+              return (
+                <div
+                  key="sunset-top"
+                  className="absolute"
+                  style={{ 
+                    left: `${positionPercent}%`,
+                    transform: 'translateX(-50%)',
+                    top: 0
+                  }}
+                >
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="text-xs font-semibold text-center text-orange-600 whitespace-nowrap">
+                      {sunsetTime.toLocaleTimeString('fr-FR', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </div>
+                    <Sunset className="h-4 w-4 text-orange-600 mx-auto mt-1" />
+                  </div>
+                </div>
+              )
+            }
+            return null
+          })()}
+        </div>
+
         {/* SVG Tide Curve */}
         <svg
           viewBox={`0 0 ${svgWidth} ${svgHeight}`}
@@ -189,68 +256,6 @@ export function TideChart({ tides, sunData, hours = 12 }: TideChartProps) {
               </div>
             )
           })}
-          
-          {/* Sunrise marker */}
-          {sunData?.sunrise && (() => {
-            const sunriseTime = new Date(sunData.sunrise)
-            const timeFromStart = sunriseTime.getTime() - startTime
-            const positionPercent = (timeFromStart / timeRange) * 100
-            
-            if (positionPercent >= 0 && positionPercent <= 100) {
-              return (
-                <div
-                  key="sunrise"
-                  className="absolute"
-                  style={{ 
-                    left: `${positionPercent}%`,
-                    transform: 'translateX(-50%)'
-                  }}
-                >
-                  <div className="flex flex-col items-center">
-                    <Sunrise className="h-4 w-4 text-orange-500" />
-                    <div className="text-xs font-semibold text-center mt-1 text-orange-500 whitespace-nowrap">
-                      {sunriseTime.toLocaleTimeString('fr-FR', { 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                      })}
-                    </div>
-                  </div>
-                </div>
-              )
-            }
-            return null
-          })()}
-          
-          {/* Sunset marker */}
-          {sunData?.sunset && (() => {
-            const sunsetTime = new Date(sunData.sunset)
-            const timeFromStart = sunsetTime.getTime() - startTime
-            const positionPercent = (timeFromStart / timeRange) * 100
-            
-            if (positionPercent >= 0 && positionPercent <= 100) {
-              return (
-                <div
-                  key="sunset"
-                  className="absolute"
-                  style={{ 
-                    left: `${positionPercent}%`,
-                    transform: 'translateX(-50%)'
-                  }}
-                >
-                  <div className="flex flex-col items-center">
-                    <Sunset className="h-4 w-4 text-orange-600" />
-                    <div className="text-xs font-semibold text-center mt-1 text-orange-600 whitespace-nowrap">
-                      {sunsetTime.toLocaleTimeString('fr-FR', { 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                      })}
-                    </div>
-                  </div>
-                </div>
-              )
-            }
-            return null
-          })()}
         </div>
       </div>
     </div>
