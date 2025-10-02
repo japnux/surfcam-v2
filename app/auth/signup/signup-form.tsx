@@ -57,7 +57,7 @@ export function SignupForm() {
 
       toast({
         title: 'Compte créé !',
-        description: 'Bienvenue sur GoSurf.',
+        description: 'Bienvenue sur NoBueno.',
       })
 
       router.push('/')

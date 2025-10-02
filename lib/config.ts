@@ -1,5 +1,5 @@
 export const config = {
-  siteName: process.env.NEXT_PUBLIC_SITE_NAME || 'GoSurf Webcams',
+  siteName: process.env.NEXT_PUBLIC_SITE_NAME || 'No Bueno Webcams',
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
   locale: 'fr',
   

@@ -37,7 +37,7 @@ export function LoginForm() {
 
       toast({
         title: 'Connexion réussie !',
-        description: 'Bienvenue sur GoSurf.',
+        description: 'Bienvenue sur NoBueno.',
       })
 
       router.push('/')
