@@ -15,10 +15,11 @@ import { Wind, Waves, Droplets, Thermometer, ArrowUp, ArrowDown, Zap } from 'luc
 interface ConditionsBannerProps {
   current: HourlyForecast
   tideHeight: number
+  tideCoefficient?: number | null
   nextTides?: TideEvent[]
 }
 
-export function ConditionsBanner({ current, tideHeight, nextTides }: ConditionsBannerProps) {
+export function ConditionsBanner({ current, tideHeight, tideCoefficient, nextTides }: ConditionsBannerProps) {
   const nextHigh = nextTides?.find(t => t.type === 'high')
   const nextLow = nextTides?.find(t => t.type === 'low')
   const tidePhase = getTidePhase(tideHeight, nextHigh?.height, nextLow?.height)
@@ -90,15 +91,15 @@ export function ConditionsBanner({ current, tideHeight, nextTides }: ConditionsB
           </div>
         </div>
 
-        {/* Tide */}
+        {/* Tide Coefficient */}
         <div className="flex items-start gap-3">
           <div className="p-2 bg-cyan-500/20 rounded-lg">
             <Droplets className="h-6 w-6 text-cyan-500" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-xs font-medium text-muted-foreground mb-1.5">MARÉE</div>
+            <div className="text-xs font-medium text-muted-foreground mb-1.5">COEFF</div>
             <div className="text-3xl font-bold text-cyan-500 mb-1">
-              {tideHeight.toFixed(1)}m
+              {tideCoefficient || '-'}
             </div>
             <div className="space-y-0.5 text-sm">
               <div className="text-muted-foreground">
@@ -117,7 +118,6 @@ export function ConditionsBanner({ current, tideHeight, nextTides }: ConditionsB
                   <span>
                     {new Date(nextTide.time).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                   </span>
-                  <span>({nextTide.height.toFixed(1)}m)</span>
                 </div>
               )}
             </div>

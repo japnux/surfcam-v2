@@ -40,7 +40,9 @@ export function TideChart({ tides, hours = 12 }: TideChartProps) {
   
   const points = hourlyData.map((h, i) => {
     const x = (i / (hourlyData.length - 1)) * svgWidth
+    // Normalize: 0 = min height, 1 = max height
     const normalizedHeight = (h.height - minHeight) / heightRange
+    // Invert for SVG: high tide (1) → small y (top), low tide (0) → large y (bottom)
     const y = svgHeight - padding - (normalizedHeight * (svgHeight - 2 * padding))
     return { x, y, time: new Date(h.time), height: h.height }
   })

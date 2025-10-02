@@ -99,6 +99,21 @@ export default async function SpotPage({ params }: SpotPageProps) {
   const current = forecastData.hourly.length > 0 ? getCurrentConditions(forecastData) : null
   const nextTides = getNextTideEvents(tides, 2)
   const currentTideHeight = getCurrentTideHeight(tides)
+  
+  // Calculate tide coefficient from amplitude (French system: 20-120)
+  // Formula: coefficient ≈ amplitude / 0.051
+  const tideCoefficient = (() => {
+    const nextHigh = nextTides.find(t => t.type === 'high')
+    const nextLow = nextTides.find(t => t.type === 'low')
+    
+    if (!nextHigh || !nextLow) return null
+    
+    const amplitude = nextHigh.height - nextLow.height
+    const coef = Math.round(amplitude / 0.051)
+    
+    // Clamp between 20 and 120 (theoretical range)
+    return Math.max(20, Math.min(120, coef))
+  })()
 
   // Check if user is logged in and if spot is favorited
   const supabase = await createClient()
@@ -241,6 +256,7 @@ export default async function SpotPage({ params }: SpotPageProps) {
           <ConditionsBanner
             current={current}
             tideHeight={currentTideHeight}
+            tideCoefficient={tideCoefficient}
             nextTides={nextTides}
           />
         )}
