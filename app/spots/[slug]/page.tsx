@@ -12,6 +12,7 @@ import { TideChart } from '@/components/tide-chart'
 import { ForecastTable } from '@/components/forecast-table'
 import { FavoriteButton } from '@/components/favorite-button'
 import { ShareButton } from '@/components/share-button'
+import { CommentSection } from '@/components/comment-section'
 import { config } from '@/lib/config'
 import { MapPin, Info } from 'lucide-react'
 
@@ -104,6 +105,14 @@ export default async function SpotPage({ params }: SpotPageProps) {
   const { data: { user } } = await supabase.auth.getUser()
   const userFavorite = user ? await isFavorite(user.id, spot.id) : false
 
+  // Get recent comments count (last 48h)
+  const { count: recentCommentsCount } = await supabase
+    .from('spot_comments')
+    .select('*', { count: 'exact', head: true })
+    .eq('spot_id', spot.id)
+    .eq('is_archived', false)
+    .gte('created_at', new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString())
+
   // JSON-LD structured data
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -147,10 +156,17 @@ export default async function SpotPage({ params }: SpotPageProps) {
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
             <h1 className="text-4xl font-bold">{spot.name}</h1>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <MapPin className="h-4 w-4" />
-              <span>{spot.city || spot.region}, {spot.country}</span>
-            </div>
+            {recentCommentsCount !== null && recentCommentsCount > 0 && (
+              <a 
+                href="#commentaires" 
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <MapPin className="h-4 w-4" />
+                <span className="underline decoration-dotted underline-offset-4">
+                  {recentCommentsCount} commentaire{recentCommentsCount > 1 ? 's' : ''} récemment (voir)
+                </span>
+              </a>
+            )}
           </div>
           {user && (
             <FavoriteButton
@@ -249,6 +265,9 @@ export default async function SpotPage({ params }: SpotPageProps) {
             />
           </div>
         </div>
+
+        {/* Community Comments */}
+        <CommentSection spotId={spot.id} />
 
         {/* License Credit */}
         {spot.license_credit && (
