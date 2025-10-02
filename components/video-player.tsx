@@ -43,7 +43,11 @@ export function VideoPlayer({ src, type, spotName }: VideoPlayerProps) {
         // Load hls.js for other browsers
         import('hls.js').then(({ default: Hls }) => {
           if (Hls.isSupported()) {
-            const hls = new Hls()
+            const hls = new Hls({
+              xhrSetup: (xhr) => {
+                xhr.withCredentials = false // Allow CORS
+              }
+            })
             hls.loadSource(src)
             hls.attachMedia(video)
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -105,6 +109,7 @@ export function VideoPlayer({ src, type, spotName }: VideoPlayerProps) {
             playsInline
             loop
             controls
+            crossOrigin="anonymous"
             aria-label={`Webcam en direct de ${spotName}`}
           />
         </>

@@ -144,7 +144,7 @@ export default async function SpotPage({ params }: SpotPageProps) {
           <div className="flex items-center gap-2">
             <ShareButton
               spotName={spot.name}
-              spotUrl={`${config.siteUrl}/spots/${spot.slug}`}
+              spotSlug={spot.slug}
             />
             {user && (
               <FavoriteButton

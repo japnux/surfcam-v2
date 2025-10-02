@@ -7,12 +7,17 @@ import { useToast } from '@/components/ui/use-toast'
 
 interface ShareButtonProps {
   spotName: string
-  spotUrl: string
+  spotSlug: string
 }
 
-export function ShareButton({ spotName, spotUrl }: ShareButtonProps) {
+export function ShareButton({ spotName, spotSlug }: ShareButtonProps) {
   const [isSharing, setIsSharing] = useState(false)
   const { toast } = useToast()
+  
+  // Get current URL dynamically (works in production without env var)
+  const spotUrl = typeof window !== 'undefined' 
+    ? `${window.location.origin}/spots/${spotSlug}`
+    : `https://surfcam-v2.vercel.app/spots/${spotSlug}`
 
   const captureVideoFrame = async (): Promise<Blob | null> => {
     try {
