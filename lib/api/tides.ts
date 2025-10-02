@@ -18,70 +18,79 @@ export async function getTides(
   latitude: number,
   longitude: number
 ): Promise<TideData> {
+  const apiKey = process.env.STORMGLASS_API_KEY
+  
+  if (!apiKey) {
+    console.warn('⚠️ STORMGLASS_API_KEY not found, using fallback tide data')
+    return getFallbackTides()
+  }
+
   try {
-    // Use Open-Meteo Marine API for tide data
-    const params = new URLSearchParams({
-      latitude: latitude.toString(),
-      longitude: longitude.toString(),
-      hourly: 'ocean_current_velocity,ocean_current_direction',
-      daily: 'tidal_range_max,tidal_range_min',
-      timezone: 'auto',
-      forecast_days: '7',
+    const now = new Date()
+    const end = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) // 7 days
+
+    // Fetch tide extremes (high/low events)
+    const extremesParams = new URLSearchParams({
+      lat: latitude.toString(),
+      lng: longitude.toString(),
+      start: now.toISOString(),
+      end: end.toISOString(),
     })
 
-    const response = await fetch(
-      `https://marine-api.open-meteo.com/v1/marine?${params}`,
-      { next: { revalidate: 3600 } } // Cache for 1 hour
+    const extremesResponse = await fetch(
+      `https://api.stormglass.io/v2/tide/extremes/point?${extremesParams}`,
+      {
+        headers: { Authorization: apiKey },
+        next: { revalidate: 3600 }, // Cache 1h
+      }
     )
 
-    if (!response.ok) {
-      throw new Error(`Open-Meteo Marine API error: ${response.status}`)
+    if (!extremesResponse.ok) {
+      throw new Error(`Stormglass Tides API error: ${extremesResponse.status}`)
     }
 
-    const data = await response.json()
+    const extremesData = await extremesResponse.json()
+
+    // Parse tide events
+    const events: TideEvent[] = (extremesData.data || []).map((event: any) => ({
+      time: event.time,
+      height: event.height,
+      type: event.type === 'high' ? 'high' : 'low',
+    }))
+
+    // Fetch hourly sea level
+    const seaLevelParams = new URLSearchParams({
+      lat: latitude.toString(),
+      lng: longitude.toString(),
+      start: now.toISOString(),
+      end: end.toISOString(),
+    })
+
+    const seaLevelResponse = await fetch(
+      `https://api.stormglass.io/v2/tide/sea-level/point?${seaLevelParams}`,
+      {
+        headers: { Authorization: apiKey },
+        next: { revalidate: 3600 },
+      }
+    )
+
+    if (!seaLevelResponse.ok) {
+      throw new Error(`Stormglass Sea Level API error: ${seaLevelResponse.status}`)
+    }
+
+    const seaLevelData = await seaLevelResponse.json()
 
     // Parse hourly tide heights
-    const hourly: HourlyTide[] = []
-    const hourlyLength = data.hourly?.time?.length || 0
+    const hourly: HourlyTide[] = (seaLevelData.data || []).map((item: any) => ({
+      time: item.time,
+      height: item.sg || 0, // Stormglass sea level in meters
+    }))
 
-    for (let i = 0; i < hourlyLength; i++) {
-      // Use ocean current velocity as proxy for tide height
-      // Open-Meteo doesn't provide direct tide height, so we estimate
-      const velocity = data.hourly.ocean_current_velocity?.[i] || 0
-      hourly.push({
-        time: data.hourly.time[i],
-        height: Math.abs(velocity) * 2 + 2, // Rough estimation
-      })
-    }
-
-    // Detect tide events (high/low) from hourly data
-    const events: TideEvent[] = []
-    for (let i = 1; i < hourly.length - 1; i++) {
-      const prev = hourly[i - 1].height
-      const current = hourly[i].height
-      const next = hourly[i + 1].height
-
-      // Local maximum (high tide)
-      if (current > prev && current > next) {
-        events.push({
-          time: hourly[i].time,
-          height: current,
-          type: 'high',
-        })
-      }
-      // Local minimum (low tide)
-      else if (current < prev && current < next) {
-        events.push({
-          time: hourly[i].time,
-          height: current,
-          type: 'low',
-        })
-      }
-    }
+    console.log(`🌊 Stormglass Tides: ${events.length} events, ${hourly.length} hourly points`)
 
     return { events, hourly }
   } catch (error) {
-    console.error('Error fetching tide data from Open-Meteo:', error)
+    console.error('Error fetching tide data from Stormglass:', error)
     
     // Fallback to mock data if API fails
     return getFallbackTides()
