@@ -69,7 +69,9 @@ export function ShareButton({ spotName, spotUrl }: ShareButtonProps) {
     setIsSharing(true)
 
     try {
+      console.log('[ShareButton] Starting share...')
       const imageBlob = await captureVideoFrame()
+      console.log('[ShareButton] Image captured:', imageBlob ? 'success' : 'failed')
       
       const shareData: ShareData = {
         title: `${spotName} - Surf Webcam`,
@@ -78,23 +80,30 @@ export function ShareButton({ spotName, spotUrl }: ShareButtonProps) {
       }
 
       // Add image if available and supported
-      if (imageBlob && navigator.canShare) {
+      if (imageBlob && typeof navigator !== 'undefined' && navigator.canShare) {
         const file = new File([imageBlob], `${spotName.toLowerCase().replace(/\s+/g, '-')}.jpg`, { type: 'image/jpeg' })
         
         // Check if can share with files
-        if (navigator.canShare({ files: [file] })) {
-          shareData.files = [file]
+        try {
+          if (navigator.canShare({ files: [file] })) {
+            shareData.files = [file]
+            console.log('[ShareButton] Image added to share data')
+          }
+        } catch (e) {
+          console.warn('[ShareButton] canShare with files not supported:', e)
         }
       }
 
       // Use Web Share API if available
-      if (navigator.share) {
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        console.log('[ShareButton] Using Web Share API with data:', shareData)
         await navigator.share(shareData)
         toast({
           title: 'Partagé !',
           description: 'Le spot a été partagé avec succès',
         })
       } else {
+        console.log('[ShareButton] Using fallback share method')
         // Fallback: download image and copy URL
         if (imageBlob) {
           const url = URL.createObjectURL(imageBlob)
@@ -113,11 +122,11 @@ export function ShareButton({ spotName, spotUrl }: ShareButtonProps) {
         })
       }
     } catch (error) {
+      console.error('[ShareButton] Share error:', error)
       if ((error as Error).name !== 'AbortError') {
-        console.error('Error sharing:', error)
         toast({
           title: 'Erreur',
-          description: 'Impossible de partager le spot',
+          description: `Impossible de partager le spot: ${(error as Error).message}`,
           variant: 'destructive',
         })
       }
