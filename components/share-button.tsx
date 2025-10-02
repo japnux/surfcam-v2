@@ -162,7 +162,7 @@ export function ShareButton({ spotName, spotSlug }: ShareButtonProps) {
         className="gap-2"
       >
         <Share2 className="h-5 w-5" />
-        Partage l'image du spot à tes potes
+        Partage l&apos;image du spot à tes potes ✌️
       </Button>
     </div>
   )
