@@ -6,10 +6,11 @@ import {
   formatTemperature,
   formatPeriod,
   formatDirection,
+  formatSwellPower,
   getWindDirectionArrow,
   getTidePhase,
 } from '@/lib/utils'
-import { Wind, Waves, Droplets, Thermometer, ArrowUp, ArrowDown } from 'lucide-react'
+import { Wind, Waves, Droplets, Thermometer, ArrowUp, ArrowDown, Zap } from 'lucide-react'
 
 interface ConditionsBannerProps {
   current: HourlyForecast
@@ -50,6 +51,12 @@ export function ConditionsBanner({ current, tideHeight, nextTides }: ConditionsB
               <div className="text-muted-foreground font-mono text-xs truncate">
                 {formatDirection(current.waveDirection)}
               </div>
+              {current.swellPower && current.swellPower > 0 && (
+                <div className="flex items-center gap-1 text-xs text-blue-400 mt-1">
+                  <Zap className="h-3 w-3" />
+                  <span className="font-medium">{formatSwellPower(current.swellPower)}</span>
+                </div>
+              )}
             </div>
             {current.secondaryWaveHeight && current.secondaryWaveHeight > 0.3 && (
               <div className="mt-2 pt-2 border-t border-border">

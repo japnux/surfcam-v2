@@ -131,6 +131,8 @@ export async function getUnifiedForecast(spot: Spot): Promise<UnifiedForecastDat
           precipitation: item.precipitation?.sg || item.precipitation || 0,
           pressure: item.pressure?.sg || item.pressure || 0,
           uvIndex: item.uvIndex?.sg || item.uvIndex || 0,
+          swellPower: item.swellPower?.sg || item.swellPower,
+          waveEnergy: item.waveEnergy?.sg || item.waveEnergy,
         }))
 
         return {

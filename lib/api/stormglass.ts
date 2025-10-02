@@ -10,6 +10,8 @@ export interface StormglassDataPoint {
   waveHeight?: { sg: number }
   waveDirection?: { sg: number }
   wavePeriod?: { sg: number }
+  swellPower?: { sg: number }
+  waveEnergy?: { sg: number }
 }
 
 export interface StormglassTidePoint {
@@ -69,6 +71,10 @@ export async function getStormglassForecast(
         'waveHeight',
         'waveDirection',
         'wavePeriod',
+        // Note: swellPower and waveEnergy may not be available in all plans
+        // Uncomment if available in your plan:
+        // 'swellPower',
+        // 'waveEnergy',
       ].join(','),
       source: 'sg', // Use only Stormglass data
     })
@@ -163,5 +169,7 @@ export function transformStormglassData(forecast: StormglassForecast) {
     waveHeight: hour.waveHeight?.sg,
     waveDirection: hour.waveDirection?.sg,
     wavePeriod: hour.wavePeriod?.sg,
+    swellPower: hour.swellPower?.sg,
+    waveEnergy: hour.waveEnergy?.sg,
   }))
 }

@@ -8,6 +8,7 @@ import { isFavorite } from '@/lib/data/favorites'
 import { createClient } from '@/lib/supabase/server'
 import { VideoPlayer } from '@/components/video-player'
 import { ConditionsBanner } from '@/components/conditions-banner'
+import { TideChart } from '@/components/tide-chart'
 import { ForecastTable } from '@/components/forecast-table'
 import { FavoriteButton } from '@/components/favorite-button'
 import { config } from '@/lib/config'
@@ -210,6 +211,9 @@ export default async function SpotPage({ params }: SpotPageProps) {
           />
         )}
 
+        {/* Tide Chart */}
+        <TideChart tides={tides} hours={12} />
+
         {/* Forecast Table */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -222,7 +226,6 @@ export default async function SpotPage({ params }: SpotPageProps) {
           <div className="bg-card border border-border rounded-lg overflow-hidden">
             <ForecastTable
               hourly={forecastData.hourly}
-              hourlyTides={tides.hourly}
               hoursToShow={48}
             />
           </div>

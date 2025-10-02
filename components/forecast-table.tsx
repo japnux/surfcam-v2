@@ -4,24 +4,17 @@ import {
   formatWindSpeed,
   formatTemperature,
   formatPeriod,
+  formatSwellPower,
   getWindDirectionArrow,
-  getSwellDirectionArrow,
 } from '@/lib/utils'
 
 interface ForecastTableProps {
   hourly: HourlyForecast[]
-  hourlyTides?: Array<{ time: string; height: number }>
   hoursToShow?: number
 }
 
-export function ForecastTable({ hourly, hourlyTides, hoursToShow = 48 }: ForecastTableProps) {
+export function ForecastTable({ hourly, hoursToShow = 48 }: ForecastTableProps) {
   const displayData = hourly.slice(0, hoursToShow)
-
-  const getTideHeight = (time: string) => {
-    if (!hourlyTides) return null
-    const tide = hourlyTides.find(t => t.time === time)
-    return tide ? tide.height.toFixed(1) : null
-  }
 
   return (
     <div className="overflow-x-auto">
@@ -30,16 +23,9 @@ export function ForecastTable({ hourly, hourlyTides, hoursToShow = 48 }: Forecas
           <tr className="border-b border-border">
             <th className="p-3 text-left font-semibold">Heure</th>
             <th className="p-3 text-left font-semibold">Vent</th>
-            <th className="p-3 text-left font-semibold">Rafales</th>
-            <th className="p-3 text-left font-semibold">Direction</th>
-            <th className="p-3 text-left font-semibold">Vagues 1</th>
-            <th className="p-3 text-left font-semibold">Période</th>
-            <th className="p-3 text-left font-semibold">Dir.</th>
-            <th className="p-3 text-left font-semibold">Vagues 2</th>
-            <th className="p-3 text-left font-semibold">Marée</th>
+            <th className="p-3 text-left font-semibold">Vagues</th>
             <th className="p-3 text-left font-semibold">Eau</th>
             <th className="p-3 text-left font-semibold">Air</th>
-            <th className="p-3 text-left font-semibold">Pluie</th>
           </tr>
         </thead>
         <tbody>
@@ -53,39 +39,66 @@ export function ForecastTable({ hourly, hourlyTides, hoursToShow = 48 }: Forecas
               weekday: 'short',
               day: 'numeric',
             })
-            const tideHeight = getTideHeight(hour.time)
+            const fullDateStr = date.toLocaleDateString('fr-FR', {
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long',
+            })
+            
+            // Check if this is a new day (00:00 or first entry)
+            const prevDate = index > 0 ? new Date(displayData[index - 1].time) : null
+            const isNewDay = !prevDate || prevDate.getDate() !== date.getDate()
 
             return (
-              <tr
-                key={hour.time}
-                className={`border-b border-border hover:bg-accent/50 transition-colors ${
-                  index % 3 === 0 ? 'bg-accent/20' : ''
-                }`}
-              >
-                <td className="p-3 font-medium whitespace-nowrap">
-                  <div>{timeStr}</div>
-                  <div className="text-xs text-muted-foreground">{dateStr}</div>
+              <>
+                {isNewDay && (
+                  <tr className="bg-primary/10 border-t-2 border-t-primary/40">
+                    <td colSpan={5} className="p-2 text-sm font-semibold text-primary">
+                      {fullDateStr.charAt(0).toUpperCase() + fullDateStr.slice(1)}
+                    </td>
+                  </tr>
+                )}
+                <tr
+                  key={hour.time}
+                  className={`border-b border-border hover:bg-accent/50 transition-colors ${
+                    index % 3 === 0 ? 'bg-accent/20' : ''
+                  }`}
+                >
+                  <td className="p-3 font-medium whitespace-nowrap">
+                    <div>{timeStr}</div>
+                    <div className="text-xs text-muted-foreground">{dateStr}</div>
+                  </td>
+                
+                {/* Vent: direction + force + rafales */}
+                <td className="p-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-lg">{getWindDirectionArrow(hour.windDirection)}</span>
+                    <span className="font-semibold">{formatWindSpeed(hour.windSpeed)}</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    Rafales: {formatWindSpeed(hour.windGust)}
+                  </div>
                 </td>
-                <td className="p-3">{formatWindSpeed(hour.windSpeed)}</td>
-                <td className="p-3">{formatWindSpeed(hour.windGust)}</td>
-                <td className="p-3 text-lg">{getWindDirectionArrow(hour.windDirection)}</td>
-                <td className="p-3 font-semibold text-primary">
-                  {formatWaveHeight(hour.waveHeight)}
+                
+                {/* Vagues: direction + taille + période */}
+                <td className="p-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-lg">{getWindDirectionArrow(hour.waveDirection)}</span>
+                    <span className="font-semibold text-blue-500">
+                      {formatWaveHeight(hour.waveHeight)} - {formatPeriod(hour.wavePeriod)}
+                    </span>
+                  </div>
+                  {hour.swellPower && hour.swellPower > 0 && (
+                    <div className="text-xs text-blue-400 mt-0.5">
+                      ⚡ {formatSwellPower(hour.swellPower)}
+                    </div>
+                  )}
                 </td>
-                <td className="p-3">{formatPeriod(hour.wavePeriod)}</td>
-                <td className="p-3 text-lg">{getSwellDirectionArrow(hour.waveDirection)}</td>
-                <td className="p-3 text-muted-foreground">
-                  {hour.secondaryWaveHeight
-                    ? `${formatWaveHeight(hour.secondaryWaveHeight)} / ${formatPeriod(
-                        hour.secondaryWavePeriod || 0
-                      )}`
-                    : '-'}
-                </td>
-                <td className="p-3">{tideHeight ? `${tideHeight}m` : '-'}</td>
+                
                 <td className="p-3">{formatTemperature(hour.waterTemp)}</td>
                 <td className="p-3">{formatTemperature(hour.airTemp)}</td>
-                <td className="p-3">{hour.precipitation > 0 ? `${hour.precipitation}mm` : '-'}</td>
               </tr>
+              </>
             )
           })}
         </tbody>

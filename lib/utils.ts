@@ -41,6 +41,17 @@ export function formatPeriod(seconds: number): string {
   return `${Math.round(seconds)}s`
 }
 
+export function formatSwellPower(kwPerMeter: number): string {
+  return `${kwPerMeter.toFixed(1)} kW/m`
+}
+
+export function formatWaveEnergy(kj: number): string {
+  if (kj >= 1000) {
+    return `${(kj / 1000).toFixed(1)} MJ`
+  }
+  return `${Math.round(kj)} kJ`
+}
+
 export function getTidePhase(height: number, nextHigh?: number, nextLow?: number): string {
   if (!nextHigh || !nextLow) return 'Inconnue'
   

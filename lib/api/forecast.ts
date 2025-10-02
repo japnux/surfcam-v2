@@ -16,6 +16,8 @@ export interface HourlyForecast {
   precipitation: number
   pressure: number
   uvIndex: number
+  swellPower?: number
+  waveEnergy?: number
 }
 
 export interface DailyData {
