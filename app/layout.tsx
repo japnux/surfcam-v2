@@ -57,7 +57,7 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <footer className="border-t border-border py-6 md:py-8">
             <div className="container text-center text-sm text-muted-foreground">
-              <p>&copy; {new Date().getFullYear()} {config.siteName}. Tous droits réservés.</p>
+              <p>&copy; {new Date().getFullYear()} {config.siteName}. Bisous.</p>
             </div>
           </footer>
         </div>

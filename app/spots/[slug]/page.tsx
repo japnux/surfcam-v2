@@ -75,18 +75,29 @@ export default async function SpotPage({ params }: SpotPageProps) {
     notFound()
   }
 
-  // Fetch forecast and tides data
-  const [forecastData, tides] = await Promise.all([
-    getUnifiedForecast(spot),
-    getTides(spot.latitude, spot.longitude),
-  ])
+  // Fetch forecast and tides data with error handling
+  let forecastData
+  let tides
+  let forecastError: string | null = null
+  let forecastSource = 'Non disponible'
+  
+  try {
+    [forecastData, tides] = await Promise.all([
+      getUnifiedForecast(spot),
+      getTides(spot.latitude, spot.longitude),
+    ])
+    forecastSource = getForecastSourceName(forecastData.meta.source)
+  } catch (error) {
+    console.error(`Forecast error for ${spot.name}:`, error)
+    forecastError = error instanceof Error ? error.message : 'Erreur de chargement des prévisions'
+    // Create empty data to prevent crashes
+    forecastData = { hourly: [], daily: [] }
+    tides = { events: [], hourly: [] }
+  }
 
-  const current = getCurrentConditions(forecastData)
+  const current = forecastData.hourly.length > 0 ? getCurrentConditions(forecastData) : null
   const nextTides = getNextTideEvents(tides, 2)
   const currentTideHeight = getCurrentTideHeight(tides)
-  
-  // Get forecast source for display
-  const forecastSource = getForecastSourceName(forecastData.meta.source)
 
   // Check if user is logged in and if spot is favorited
   const supabase = await createClient()
@@ -227,7 +238,8 @@ export default async function SpotPage({ params }: SpotPageProps) {
             <h2 className="text-2xl font-bold">Prévisions horaires (48h)</h2>
             <span className="text-sm text-muted-foreground">
               Source: {forecastSource}
-              {forecastData.meta.fromCache && ' (cache)'}
+              {forecastData.meta?.fromCache && ' (cache)'}
+              {forecastError && <span className="text-destructive ml-2">⚠️ {forecastError}</span>}
             </span>
           </div>
           <div className="bg-card border border-border rounded-lg overflow-hidden">

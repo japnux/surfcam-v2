@@ -64,10 +64,32 @@ export async function getForecast(
     forecast_days: '7',
   })
 
-  const [weatherRes, marineRes] = await Promise.all([
-    fetch(`${config.openMeteo.weatherUrl}?${weatherParams}`),
-    fetch(`${config.openMeteo.marineUrl}?${marineParams}`),
-  ])
+  // Fetch with timeout and retry
+  const fetchWithTimeout = async (url: string, timeout = 8000) => {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeout)
+    
+    try {
+      const response = await fetch(url, { signal: controller.signal })
+      clearTimeout(timeoutId)
+      return response
+    } catch (error) {
+      clearTimeout(timeoutId)
+      throw error
+    }
+  }
+
+  let weatherRes, marineRes
+  
+  try {
+    [weatherRes, marineRes] = await Promise.all([
+      fetchWithTimeout(`${config.openMeteo.weatherUrl}?${weatherParams}`),
+      fetchWithTimeout(`${config.openMeteo.marineUrl}?${marineParams}`),
+    ])
+  } catch (error) {
+    console.error('Open-Meteo API timeout or error:', error)
+    throw new Error('Les prévisions météo ne sont pas disponibles pour le moment')
+  }
 
   if (!weatherRes.ok || !marineRes.ok) {
     throw new Error('Failed to fetch forecast data')
