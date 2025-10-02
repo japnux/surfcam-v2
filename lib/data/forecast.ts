@@ -135,9 +135,18 @@ export async function getUnifiedForecast(spot: Spot): Promise<UnifiedForecastDat
           waveEnergy: item.waveEnergy?.sg || item.waveEnergy,
         }))
 
+        // Fetch sunrise/sunset from Open-Meteo (Stormglass doesn't provide it)
+        let daily = []
+        try {
+          const openMeteoData = await getOpenMeteoForecast(spot.latitude, spot.longitude)
+          daily = openMeteoData.daily
+        } catch (err) {
+          console.warn('Failed to fetch daily data from Open-Meteo:', err)
+        }
+
         return {
           hourly,
-          daily: [], // Stormglass doesn't provide daily data, keep empty
+          daily,
           meta: {
             source: 'stormglass',
             fromCache: result.fromCache,
