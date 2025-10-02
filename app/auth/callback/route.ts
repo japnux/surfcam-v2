@@ -28,19 +28,27 @@ export async function GET(request: NextRequest) {
   }
 
   // Handle legacy magic link flow (old format with token)
+  // Note: This flow is deprecated in favor of PKCE (token_hash)
   if (token && type) {
-    const { data, error } = await supabase.auth.verifyOtp({
-      type: type === 'magiclink' ? 'email' : (type as any),
-      token,
-    })
+    // Try to exchange the token directly as a session
+    // This is a fallback for very old magic links
+    try {
+      const { data, error } = await supabase.auth.setSession({
+        access_token: token,
+        refresh_token: token,
+      })
 
-    if (!error && data.user) {
-      try {
-        await getOrCreateProfile(data.user.id, data.user.email || '')
-      } catch (err) {
-        console.error('Failed to create profile:', err)
+      if (!error && data.user) {
+        try {
+          await getOrCreateProfile(data.user.id, data.user.email || '')
+        } catch (err) {
+          console.error('Failed to create profile:', err)
+        }
+        return NextResponse.redirect(new URL(next, origin))
       }
-      return NextResponse.redirect(new URL(next, origin))
+    } catch {
+      // If setSession fails, just continue to code exchange
+      console.log('Legacy token verification failed, trying code exchange')
     }
   }
 
