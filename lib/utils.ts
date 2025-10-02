@@ -11,6 +11,16 @@ export function getWindDirectionArrow(degrees: number): string {
   return arrows[index]
 }
 
+export function getDirectionName(degrees: number): string {
+  const directions = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO']
+  const index = Math.round(degrees / 45) % 8
+  return directions[index]
+}
+
+export function formatDirection(degrees: number): string {
+  return `${getWindDirectionArrow(degrees)} ${getDirectionName(degrees)} (${Math.round(degrees)}°)`
+}
+
 export function getSwellDirectionArrow(degrees: number): string {
   return getWindDirectionArrow(degrees)
 }

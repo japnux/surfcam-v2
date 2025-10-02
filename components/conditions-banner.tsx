@@ -5,11 +5,10 @@ import {
   formatWindSpeed,
   formatTemperature,
   formatPeriod,
-  getWindDirectionArrow,
-  getSwellDirectionArrow,
+  formatDirection,
   getTidePhase,
 } from '@/lib/utils'
-import { Wind, Waves, Droplets, Thermometer } from 'lucide-react'
+import { Wind, Waves, Droplets, Thermometer, ArrowUp, ArrowDown } from 'lucide-react'
 
 interface ConditionsBannerProps {
   current: HourlyForecast
@@ -21,87 +20,120 @@ export function ConditionsBanner({ current, tideHeight, nextTides }: ConditionsB
   const nextHigh = nextTides?.find(t => t.type === 'high')
   const nextLow = nextTides?.find(t => t.type === 'low')
   const tidePhase = getTidePhase(tideHeight, nextHigh?.height, nextLow?.height)
+  
+  // Determine next tide (closest one)
+  const nextTide = (() => {
+    if (!nextHigh && !nextLow) return null
+    if (!nextHigh) return nextLow
+    if (!nextLow) return nextHigh
+    return new Date(nextHigh.time) < new Date(nextLow.time) ? nextHigh : nextLow
+  })()
 
   return (
     <div className="bg-card border border-border rounded-lg p-6 shadow-lg">
-      <h2 className="text-2xl font-bold mb-4">Conditions actuelles</h2>
+      <h2 className="text-2xl font-bold mb-6">Conditions actuelles</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Wind */}
+        {/* Waves */}
         <div className="flex items-start gap-3">
-          <div className="p-2 bg-primary/20 rounded-lg">
-            <Wind className="h-6 w-6 text-primary" />
+          <div className="p-2 bg-blue-500/20 rounded-lg">
+            <Waves className="h-6 w-6 text-blue-500" />
           </div>
-          <div>
-            <div className="text-xs text-muted-foreground mb-1">Vent</div>
-            <div className="text-2xl font-bold">
-              {formatWindSpeed(current.windSpeed)}
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-medium text-muted-foreground mb-1.5">VAGUES</div>
+            <div className="text-3xl font-bold text-blue-500 mb-1">
+              {formatWaveHeight(current.waveHeight)}
             </div>
-            <div className="text-sm text-muted-foreground">
-              Rafales: {formatWindSpeed(current.windGust)}
+            <div className="space-y-0.5 text-sm">
+              <div className="text-muted-foreground">
+                <span className="font-medium">Période:</span> {formatPeriod(current.wavePeriod)}
+              </div>
+              <div className="text-muted-foreground font-mono text-xs truncate">
+                {formatDirection(current.waveDirection)}
+              </div>
             </div>
-            <div className="text-lg mt-1">{getWindDirectionArrow(current.windDirection)}</div>
+            {current.secondaryWaveHeight && current.secondaryWaveHeight > 0.3 && (
+              <div className="mt-2 pt-2 border-t border-border">
+                <div className="text-xs text-muted-foreground">
+                  <span className="font-medium">Houle 2:</span> {formatWaveHeight(current.secondaryWaveHeight)} · {formatPeriod(current.secondaryWavePeriod || 0)}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Waves */}
+        {/* Wind */}
         <div className="flex items-start gap-3">
-          <div className="p-2 bg-primary/20 rounded-lg">
-            <Waves className="h-6 w-6 text-primary" />
+          <div className="p-2 bg-green-500/20 rounded-lg">
+            <Wind className="h-6 w-6 text-green-500" />
           </div>
-          <div>
-            <div className="text-xs text-muted-foreground mb-1">Vagues</div>
-            <div className="text-2xl font-bold text-primary">
-              {formatWaveHeight(current.waveHeight)}
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-medium text-muted-foreground mb-1.5">VENT</div>
+            <div className="text-3xl font-bold text-green-500 mb-1">
+              {formatWindSpeed(current.windSpeed)}
             </div>
-            <div className="text-sm text-muted-foreground">
-              Période: {formatPeriod(current.wavePeriod)}
-            </div>
-            <div className="text-lg mt-1">{getSwellDirectionArrow(current.waveDirection)}</div>
-            {current.secondaryWaveHeight && (
-              <div className="text-xs text-muted-foreground mt-1">
-                Houle 2: {formatWaveHeight(current.secondaryWaveHeight)} / {formatPeriod(current.secondaryWavePeriod || 0)}
+            <div className="space-y-0.5 text-sm">
+              <div className="text-muted-foreground">
+                <span className="font-medium">Rafales:</span> {formatWindSpeed(current.windGust)}
               </div>
-            )}
+              <div className="text-muted-foreground font-mono text-xs truncate">
+                {formatDirection(current.windDirection)}
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Tide */}
         <div className="flex items-start gap-3">
-          <div className="p-2 bg-primary/20 rounded-lg">
-            <Droplets className="h-6 w-6 text-primary" />
+          <div className="p-2 bg-cyan-500/20 rounded-lg">
+            <Droplets className="h-6 w-6 text-cyan-500" />
           </div>
-          <div>
-            <div className="text-xs text-muted-foreground mb-1">Marée</div>
-            <div className="text-2xl font-bold">
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-medium text-muted-foreground mb-1.5">MARÉE</div>
+            <div className="text-3xl font-bold text-cyan-500 mb-1">
               {tideHeight.toFixed(1)}m
             </div>
-            <div className="text-sm text-muted-foreground">
-              {tidePhase}
-            </div>
-            {nextHigh && (
-              <div className="text-xs text-muted-foreground mt-1">
-                Prochaine haute: {new Date(nextHigh.time).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+            <div className="space-y-0.5 text-sm">
+              <div className="text-muted-foreground">
+                <span className="font-medium">{tidePhase}</span>
               </div>
-            )}
+              {nextTide && (
+                <div className="flex items-center gap-1 text-muted-foreground text-xs">
+                  {nextTide.type === 'high' ? (
+                    <ArrowUp className="h-3 w-3" />
+                  ) : (
+                    <ArrowDown className="h-3 w-3" />
+                  )}
+                  <span className="font-medium">
+                    {nextTide.type === 'high' ? 'Haute' : 'Basse'}:
+                  </span>
+                  <span>
+                    {new Date(nextTide.time).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                  <span>({nextTide.height.toFixed(1)}m)</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Temperature */}
         <div className="flex items-start gap-3">
-          <div className="p-2 bg-primary/20 rounded-lg">
-            <Thermometer className="h-6 w-6 text-primary" />
+          <div className="p-2 bg-orange-500/20 rounded-lg">
+            <Thermometer className="h-6 w-6 text-orange-500" />
           </div>
-          <div>
-            <div className="text-xs text-muted-foreground mb-1">Température</div>
-            <div className="text-2xl font-bold">
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-medium text-muted-foreground mb-1.5">TEMPÉRATURE</div>
+            <div className="text-3xl font-bold text-orange-500 mb-1">
               {formatTemperature(current.waterTemp)}
             </div>
-            <div className="text-sm text-muted-foreground">
-              Eau
-            </div>
-            <div className="text-sm mt-1">
-              Air: {formatTemperature(current.airTemp)}
+            <div className="space-y-0.5 text-sm">
+              <div className="text-muted-foreground">
+                <span className="font-medium">Eau</span>
+              </div>
+              <div className="text-muted-foreground">
+                <span className="font-medium">Air:</span> {formatTemperature(current.airTemp)}
+              </div>
             </div>
           </div>
         </div>
