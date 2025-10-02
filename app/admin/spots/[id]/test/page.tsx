@@ -120,7 +120,6 @@ export default async function TestSpotPage({ params }: TestSpotPageProps) {
               <div className="bg-card border border-border rounded-lg overflow-hidden">
                 <ForecastTable
                   hourly={forecast.hourly}
-                  hourlyTides={tides?.hourly}
                   hoursToShow={24}
                 />
               </div>
