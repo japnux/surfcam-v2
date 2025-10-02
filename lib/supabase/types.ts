@@ -56,6 +56,7 @@ export interface Database {
           cam_type: string
           license_credit: string | null
           is_active: boolean
+          has_daily_forecast: boolean
           created_at: string
           updated_at: string
         }
@@ -79,6 +80,7 @@ export interface Database {
           cam_type: string
           license_credit?: string | null
           is_active?: boolean
+          has_daily_forecast?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -102,6 +104,7 @@ export interface Database {
           cam_type?: string
           license_credit?: string | null
           is_active?: boolean
+          has_daily_forecast?: boolean
           created_at?: string
           updated_at?: string
         }

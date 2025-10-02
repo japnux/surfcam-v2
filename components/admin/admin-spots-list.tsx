@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Edit, Trash2, Eye, TestTube } from 'lucide-react'
 import { SpotStatusToggle } from './spot-status-toggle'
+import { ForecastToggle } from './forecast-toggle'
 import type { Spot } from '@/lib/data/spots'
 
 interface AdminSpotsListProps {
@@ -64,6 +65,11 @@ export function AdminSpotsList({ spots }: AdminSpotsListProps) {
                   <SpotStatusToggle
                     spotId={spot.id}
                     isActive={spot.is_active}
+                    spotName={spot.name}
+                  />
+                  <ForecastToggle
+                    spotId={spot.id}
+                    hasDailyForecast={spot.has_daily_forecast || false}
                     spotName={spot.name}
                   />
                   <Button variant="ghost" size="icon" asChild>

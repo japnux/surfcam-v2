@@ -9,10 +9,16 @@ export const config = {
   // Cache TTL in seconds (default 15 minutes)
   forecastCacheTTL: parseInt(process.env.FORECAST_CACHE_TTL || '900', 10),
   
-  // Open-Meteo API URLs
+  // Open-Meteo API URLs (fallback for spots without daily forecast)
   openMeteo: {
     weatherUrl: process.env.OPEN_METEO_WEATHER_URL || 'https://api.open-meteo.com/v1/forecast',
     marineUrl: process.env.OPEN_METEO_MARINE_URL || 'https://marine-api.open-meteo.com/v1/marine',
+  },
+  
+  // Stormglass API (for premium spots with daily forecast - 10 calls/day limit)
+  stormglass: {
+    apiKey: process.env.STORMGLASS_API_KEY || '',
+    baseUrl: 'https://api.stormglass.io/v2',
   },
   
   // Admin user IDs (comma-separated)

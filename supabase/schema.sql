@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS spots (
   cam_type TEXT NOT NULL,
   license_credit TEXT,
   is_active BOOLEAN NOT NULL DEFAULT true,
+  has_daily_forecast BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

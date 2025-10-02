@@ -7,6 +7,7 @@ import { getAllSpots } from '@/lib/data/spots'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { AdminSpotsList } from '@/components/admin/admin-spots-list'
+import { StormglassUsage } from '@/components/admin/stormglass-usage'
 
 export const metadata: Metadata = {
   title: 'Administration',
@@ -40,6 +41,9 @@ export default async function AdminPage() {
           </Link>
         </Button>
       </div>
+
+      {/* Stormglass Usage Stats */}
+      <StormglassUsage />
 
       <AdminSpotsList spots={spots} />
     </div>
