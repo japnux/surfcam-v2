@@ -1,225 +1,226 @@
-import * as cheerio from 'cheerio';
-import { createClient } from '@supabase/supabase-js';
-import { config as dotenvConfig } from 'dotenv';
-
-// Load environment variables from .env.local
-dotenvConfig({ path: '.env.local' });
-
-// --- Type Definitions ---
-interface Spot {
-  id: number;
-  name: string;
-  city: string;
-}
-
-interface Forecast {
-  time: string;
-  swellSize: string;
-  swellPeriod: string;
-  swellDirection: string | undefined;
-  windSpeed: string;
-  windDirection: string | undefined;
-}
-
-interface DailyForecast {
-  date: string;
-  forecasts: Forecast[];
-}
-
-// --- Supabase Client Setup ---
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Supabase URL and service key are required. Please check your .env.local file.');
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-// --- Scraper Functions ---
-
 /**
- * Fetches all active spots from the Supabase database.
+ * GoSurf.fr Scraper
+ * 
+ * This scraper extracts surf spot data from gosurf.fr including:
+ * - Spot names and locations
+ * - HLS webcam stream URLs
+ * 
+ * Run with: npm run scrape
+ * 
+ * Note: This will take several minutes as it fetches each spot page individually
+ * to extract the HLS stream URLs.
  */
-async function getSpotsFromSupabase(): Promise<Spot[]> {
-  console.log('🌊 Fetching spots from Supabase...');
-  const { data, error } = await supabase.from('spots').select('id, name, city').eq('is_active', true);
 
-  if (error) {
-    console.error('Error fetching spots:', error);
-    return [];
+import * as cheerio from 'cheerio'
+
+interface ScrapedSpot {
+  name: string
+  slug: string
+  country: string
+  region: string
+  city: string | null
+  latitude: number
+  longitude: number
+  timezone: string
+  break_type: string | null
+  orientation: string | null
+  level: string | null
+  cam_url: string
+  cam_type: string
+  is_active: boolean
+}
+
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+async function extractHlsUrl(pageUrl: string): Promise<string | null> {
+  try {
+    const response = await fetch(pageUrl)
+    const html = await response.text()
+    
+    // Look for data-src attribute containing the stream ID
+    const dataSrcMatch = html.match(/data-src="([^"]+)"/i)
+    
+    if (dataSrcMatch && dataSrcMatch[1]) {
+      const streamId = dataSrcMatch[1]
+      // Build Quanteec CDN URL
+      return `https://ds1-cache.quanteec.com/contents/encodings/live/${streamId}/media_0.m3u8`
+    }
+    
+    // Fallback: try to find direct .m3u8 URLs
+    const m3u8Match = html.match(/https:\/\/[^"'\s]+\.m3u8/i)
+    if (m3u8Match) {
+      return m3u8Match[0]
+    }
+    
+    return null
+  } catch (error) {
+    return null
   }
-
-  console.log(`✅ Found ${data.length} active spots.`);
-  return data;
 }
 
-/**
- * Creates a map of spot names to their forecast URLs from the Allosurf index page.
- */
-async function createAlloSurfSpotMap(): Promise<Map<string, string>> {
-  console.log('🗺️ Building Allosurf spot map...');
-  const spotMap = new Map<string, string>();
-  const url = 'https://www.allosurf.net/meteo/selection-plage-spot-3.html';
+async function scrapeGoSurf(): Promise<ScrapedSpot[]> {
+  const spots: ScrapedSpot[] = []
 
   try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch spot index page. Status: ${response.status}`);
-    }
-    const html = await response.text();
-    const $ = cheerio.load(html);
+    console.log('🌊 Fetching GoSurf list page...')
+    const response = await fetch('https://gosurf.fr/list')
+    const html = await response.text()
+    const $ = cheerio.load(html)
 
-    $('a[href*="meteo/surf/"]').each((i, el) => {
-      const $el = $(el);
-      const href = $el.attr('href');
-      const name = $el.text().replace('Météo surf', '').trim();
-      if (name && href) {
-        spotMap.set(name, `https://www.allosurf.net/${href}`);
-      }
-    });
+    console.log('📝 Parsing spots...\n')
 
-    console.log(`✅ Built map with ${spotMap.size} spots.`);
-    return spotMap;
-  } catch (error) {
-    console.error('Error building Allosurf spot map:', error);
-    return spotMap;
-  }
-}
-
-/**
- * Scrapes the forecast data from a specific Allosurf forecast page.
- */
-async function scrapeAlloSurfForecast(url: string): Promise<DailyForecast[]> {
-  const dailyForecasts: DailyForecast[] = [];
-  try {
-    const response = await fetch(url);
-    if (!response.ok) return [];
-
-    const html = await response.text();
-    const $ = cheerio.load(html);
-
-    $('table.as-prev-jour-int').each((i, dayTable) => {
-      const $dayTable = $(dayTable);
-      const date = $dayTable.find('thead th').first().text().trim();
-      const forecasts: Forecast[] = [];
-
-      $dayTable.find('tbody tr').each((j, hourRow) => {
-        const $hourRow = $(hourRow);
-        forecasts.push({
-          time: $hourRow.find('td').first().text().trim(),
-          swellSize: $hourRow.find('td.houle span.taille').text().trim(),
-          swellPeriod: $hourRow.find('td.houle span.periode').text().trim(),
-          swellDirection: $hourRow.find('td.houle span.dir img').attr('title'),
-          windSpeed: $hourRow.find('td.vent span.force').text().trim(),
-          windDirection: $hourRow.find('td.vent span.dir img').attr('title'),
-        });
-      });
-
-      if (forecasts.length > 0) {
-        dailyForecasts.push({ date, forecasts });
-      }
-    });
-  } catch (error) {
-    console.error(`Error scraping forecast from ${url}:`, error);
-  }
-  return dailyForecasts;
-}
-
-/**
- * A simple string similarity function (Jaro-Winkler distance).
- */
-function stringSimilarity(s1: string, s2: string): number {
-    let m = 0;
-    if (s1.length === 0 || s2.length === 0) return 0;
-    const range = Math.floor(Math.max(s1.length, s2.length) / 2) - 1;
-    const s1Matches = new Array(s1.length).fill(false);
-    const s2Matches = new Array(s2.length).fill(false);
-
-    for (let i = 0; i < s1.length; i++) {
-        const start = Math.max(0, i - range);
-        const end = Math.min(i + range + 1, s2.length);
-        for (let j = start; j < end; j++) {
-            if (s2Matches[j]) continue;
-            if (s1[i] !== s2[j]) continue;
-            s1Matches[i] = true;
-            s2Matches[j] = true;
-            m++;
-            break;
-        }
-    }
-
-    if (m === 0) return 0;
-
-    let t = 0;
-    let k = 0;
-    for (let i = 0; i < s1.length; i++) {
-        if (!s1Matches[i]) continue;
-        while (!s2Matches[k]) k++;
-        if (s1[i] !== s2[k]) t++;
-        k++;
-    }
-
-    const jaro = (m / s1.length + m / s2.length + (m - t / 2) / m) / 3;
-    const p = 0.1;
-    let l = 0;
-    while (s1[l] === s2[l] && l < 4) l++;
-
-    return jaro + l * p * (1 - jaro);
-}
-
-
-// --- Main Execution ---
-async function main() {
-  console.log('🚀 Starting Allosurf forecast scraper...');
-  console.log('======================================\\n');
-
-  const alloSurfMap = await createAlloSurfSpotMap();
-  if (alloSurfMap.size === 0) {
-    console.log('Could not build Allosurf spot map. Exiting.');
-    return;
-  }
-
-  const spots = await getSpotsFromSupabase();
-  if (spots.length === 0) {
-    console.log('No spots to process. Exiting.');
-    return;
-  }
-
-  for (const spot of spots) {
-    console.log(`\n--- Processing: ${spot.name} ---`);
-    const searchTerm = spot.name.replace(`${spot.city} - `, '').toLowerCase();
+    const spotLinks: Array<{ href: string; fullText: string }> = []
     
-    console.log(`🔍 Matching "${searchTerm}" in the spot map...`);
-    
-    let bestMatchUrl: string | undefined;
-    let highestScore = 0.7; // Set a threshold to avoid bad matches
+    // Collect all spot links first
+    $('a[href^="/webcam/fr/"]').each((i, el) => {
+      const $el = $(el)
+      const href = $el.attr('href')
+      const fullText = $el.text().trim()
+      
+      if (href && fullText.includes('|')) {
+        spotLinks.push({ href, fullText })
+      }
+    })
 
-    for (const [key, url] of alloSurfMap.entries()) {
-        const score = stringSimilarity(searchTerm, key.toLowerCase());
-        if (score > highestScore) {
-            highestScore = score;
-            bestMatchUrl = url;
-        }
-    }
+    console.log(`Found ${spotLinks.length} spots. Fetching HLS URLs...\n`)
+    console.log('⏳ This may take a few minutes (please be patient)...\n')
 
-    if (bestMatchUrl) {
-      console.log(`✅ Found best match with score ${highestScore.toFixed(2)}: ${bestMatchUrl}`);
-      const forecasts = await scrapeAlloSurfForecast(bestMatchUrl);
-      if (forecasts.length > 0) {
-        console.log(`📝 Scraped ${forecasts.length} days of forecast data.`);
-        console.log(JSON.stringify(forecasts[0], null, 2)); // Log first day for brevity
+    // Process each spot (with delay to avoid overwhelming the server)
+    for (let i = 0; i < spotLinks.length; i++) {
+      const { href, fullText } = spotLinks[i]
+      
+      // Parse spot info
+      const parts = fullText.replace('live', '').trim().split('|')
+      if (parts.length < 2) continue
+
+      const country = parts[0].trim()
+      const locationAndName = parts[1].trim()
+      
+      const locationParts = locationAndName.split(/\s+/)
+      const city = locationParts[0]
+      const spotName = locationParts.slice(1).join(' ')
+      
+      if (!city || !spotName) continue
+
+      // Build webcam URL
+      const webcamPageUrl = `https://gosurf.fr${href}`
+      
+      // Extract HLS URL from the page
+      console.log(`[${i + 1}/${spotLinks.length}] ${city} - ${spotName}...`)
+      const hlsUrl = await extractHlsUrl(webcamPageUrl)
+      
+      if (!hlsUrl) {
+        console.log(`  ⚠️  No HLS URL found`)
       } else {
-        console.log('⚠️ No forecast data found on the page.');
+        console.log(`  ✓ Found stream`)
       }
-    } else {
-      console.log(`❌ Could not find a suitable match for "${searchTerm}".`);
+      
+      // Determine region based on city
+      let region = 'France'
+      let timezone = 'Europe/Paris'
+      
+      if (country === 'Portugal') {
+        region = 'Portugal'
+        timezone = 'Europe/Lisbon'
+      } else if (['Anglet', 'Biarritz', 'Bidart', 'Capbreton', 'Hossegor', 'Seignosse', 'Hendaye'].includes(city)) {
+        region = 'Nouvelle-Aquitaine'
+      } else if (['Lacanau', 'Biscarrosse', 'Mimizan', 'Contis'].includes(city)) {
+        region = 'Nouvelle-Aquitaine'
+      } else if (['Bénodet', 'Crozon'].includes(city)) {
+        region = 'Bretagne'
+      } else if (city === 'Dunkerque') {
+        region = 'Hauts-de-France'
+      }
+
+      spots.push({
+        name: `${city} - ${spotName}`,
+        slug: generateSlug(`${city}-${spotName}`),
+        country: country === 'Portugal' ? 'Portugal' : 'France',
+        region,
+        city,
+        latitude: 0, // Still need manual entry or geocoding API
+        longitude: 0,
+        timezone,
+        break_type: null,
+        orientation: null,
+        level: null,
+        cam_url: hlsUrl || webcamPageUrl, // Use HLS URL if found, otherwise page URL
+        cam_type: 'hls',
+        is_active: hlsUrl !== null, // Only active if we found a stream
+      })
+
+      // Small delay to avoid overwhelming the server (500ms between requests)
+      if (i < spotLinks.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+      }
     }
 
-    await new Promise(resolve => setTimeout(resolve, 200)); // Shorter delay
+    console.log(`\n✅ Successfully scraped ${spots.filter(s => s.is_active).length}/${spots.length} spots with HLS URLs`)
+
+  } catch (error) {
+    console.error('Scraping error:', error)
   }
 
-  console.log('\\n✅ Forecast scraping complete!');
+  return spots
 }
 
-main().catch(console.error);
+async function main() {
+  console.log('🌊 GoSurf Scraper')
+  console.log('==================\n')
+
+  const spots = await scrapeGoSurf()
+
+  if (spots.length === 0) {
+    console.log('No spots scraped.')
+    return
+  }
+
+  console.log(`\nGenerating SQL for ${spots.length} spots:\n`)
+  console.log(`📊 Summary:`)
+  console.log(`   - Total spots: ${spots.length}`)
+  console.log(`   - With HLS URLs: ${spots.filter(s => s.is_active).length}`)
+  console.log(`   - Without HLS URLs: ${spots.filter(s => !s.is_active).length}\n`)
+  
+  // Generate SQL insert statements
+  console.log('-- Insert statements for spots')
+  console.log('INSERT INTO spots (slug, name, country, region, city, latitude, longitude, timezone, break_type, orientation, level, cam_url, cam_type, is_active) VALUES')
+  
+  const values = spots.map((spot, i) => {
+    const values = [
+      spot.slug,
+      spot.name,
+      spot.country,
+      spot.region,
+      spot.city,
+      spot.latitude,
+      spot.longitude,
+      spot.timezone,
+      spot.break_type,
+      spot.orientation,
+      spot.level,
+      spot.cam_url,
+      spot.cam_type,
+      spot.is_active,
+    ]
+    
+    const formatted = values.map(v => {
+      if (v === null) return 'NULL'
+      if (typeof v === 'string') return `'${v.replace(/'/g, "''")}'`
+      return v
+    }).join(', ')
+    
+    return `(${formatted})${i < spots.length - 1 ? ',' : ';'}`
+  }).join('\n')
+  
+  console.log(values)
+  console.log('\n✅ Done!')
+}
+
+main().catch(console.error)

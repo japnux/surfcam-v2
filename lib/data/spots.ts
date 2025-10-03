@@ -103,40 +103,46 @@ export async function getCitiesGroupedByRegion() {
 
   const { data: spots, error } = await supabase
     .from('spots')
-    .select('city, region')
+    .select('city, region, country')
     .eq('is_active', true)
     .not('city', 'is', null)
     .not('region', 'is', null)
+    .not('country', 'is', null)
 
   if (error) throw error
 
-  // Count spots per city
-  const cityCounts: { [key: string]: { region: string; count: number } } = {}
+  // Count spots per city and associate with region and country
+  const cityCounts: { [key: string]: { region: string; country: string; count: number } } = {}
   for (const spot of spots) {
-    if (spot.city && spot.region) {
+    if (spot.city && spot.region && spot.country) {
       if (!cityCounts[spot.city]) {
-        cityCounts[spot.city] = { region: spot.region, count: 0 }
+        cityCounts[spot.city] = { region: spot.region, country: spot.country, count: 0 }
       }
       cityCounts[spot.city].count++
     }
   }
 
-  // Group cities by region
-  const regionGroups: { [key: string]: { name: string; spotCount: number }[] } = {}
+  // Group regions by country
+  const countryGroups: { [key: string]: { [key: string]: { name: string; spotCount: number }[] } } = {}
   for (const cityName in cityCounts) {
     const cityData = cityCounts[cityName]
-    if (!regionGroups[cityData.region]) {
-      regionGroups[cityData.region] = []
+    if (!countryGroups[cityData.country]) {
+      countryGroups[cityData.country] = {}
     }
-    regionGroups[cityData.region].push({ name: cityName, spotCount: cityData.count })
+    if (!countryGroups[cityData.country][cityData.region]) {
+      countryGroups[cityData.country][cityData.region] = []
+    }
+    countryGroups[cityData.country][cityData.region].push({ name: cityName, spotCount: cityData.count })
   }
 
-  // Sort cities within each region by spot count
-  for (const region in regionGroups) {
-    regionGroups[region].sort((a, b) => b.spotCount - a.spotCount)
+  // Sort cities within each region
+  for (const country in countryGroups) {
+    for (const region in countryGroups[country]) {
+      countryGroups[country][region].sort((a, b) => b.spotCount - a.spotCount)
+    }
   }
 
-  return regionGroups
+  return countryGroups
 }
 
 export async function getCities() {
