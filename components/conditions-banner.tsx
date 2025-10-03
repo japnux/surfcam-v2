@@ -10,7 +10,7 @@ import {
   getWindDirectionArrow,
   getTidePhase,
 } from '@/lib/utils'
-import { Wind, Waves, Droplets, Thermometer, ArrowUp, ArrowDown, Zap } from 'lucide-react'
+import { Wind, Waves, Clock, Thermometer, ArrowUp, ArrowDown, Zap } from 'lucide-react'
 
 interface ConditionsBannerProps {
   current: HourlyForecast
@@ -46,24 +46,28 @@ export function ConditionsBanner({ current, tideHeight, tideCoefficient, nextTid
             <div className="text-xs font-medium text-muted-foreground mb-1.5">VAGUES</div>
             <div className="text-3xl font-bold text-blue-500 mb-1 flex items-center gap-2">
               <span className="font-mono" style={{ fontVariantEmoji: 'text' }}>{getWindDirectionArrow(current.waveDirection)}</span>
-              <span>{formatWaveHeight(current.waveHeight)} - {formatPeriod(current.wavePeriod)}</span>
+              <span>{formatWaveHeight(current.waveHeight)}</span>
             </div>
-            <div className="space-y-0.5 text-sm">
-              <div className="text-muted-foreground font-mono text-xs truncate">
-                {formatDirection(current.waveDirection)}
-              </div>
-              {current.swellPower && current.swellPower > 0 && (
-                <div className="flex items-center gap-1 text-xs text-blue-400 mt-1">
-                  <Zap className="h-3 w-3" />
-                  <span className="font-medium">{formatSwellPower(current.swellPower)}</span>
-                </div>
-              )}
+            <div className="text-muted-foreground font-mono text-xs truncate">
+              {formatDirection(current.waveDirection)}
             </div>
-            {current.secondaryWaveHeight && current.secondaryWaveHeight > 0.3 && (
-              <div className="mt-2 pt-2 border-t border-border">
-                <div className="text-xs text-muted-foreground">
-                  <span className="font-medium">Houle 2:</span> {formatWaveHeight(current.secondaryWaveHeight)} · {formatPeriod(current.secondaryWavePeriod || 0)}
-                </div>
+          </div>
+        </div>
+
+        {/* Wave Period */}
+        <div className="flex items-start gap-3">
+          <div className="p-2 bg-purple-500/20 rounded-lg">
+            <Clock className="h-6 w-6 text-purple-500" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-medium text-muted-foreground mb-1.5">PÉRIODE</div>
+            <div className="text-3xl font-bold text-purple-500 mb-1">
+              {formatPeriod(current.wavePeriod)}
+            </div>
+            {current.swellPower && current.swellPower > 0 && (
+              <div className="flex items-center gap-1 text-xs text-blue-400 mt-1">
+                <Zap className="h-3 w-3" />
+                <span className="font-medium">{formatSwellPower(current.swellPower)}</span>
               </div>
             )}
           </div>
@@ -91,38 +95,6 @@ export function ConditionsBanner({ current, tideHeight, tideCoefficient, nextTid
           </div>
         </div>
 
-        {/* Tide Coefficient */}
-        <div className="flex items-start gap-3">
-          <div className="p-2 bg-cyan-500/20 rounded-lg">
-            <Droplets className="h-6 w-6 text-cyan-500" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-xs font-medium text-muted-foreground mb-1.5">COEFF</div>
-            <div className="text-3xl font-bold text-cyan-500 mb-1">
-              {tideCoefficient || '-'}
-            </div>
-            <div className="space-y-0.5 text-sm">
-              <div className="text-muted-foreground">
-                <span className="font-medium">{tidePhase}</span>
-              </div>
-              {nextTide && (
-                <div className="flex items-center gap-1 text-muted-foreground text-xs">
-                  {nextTide.type === 'high' ? (
-                    <ArrowUp className="h-3 w-3" />
-                  ) : (
-                    <ArrowDown className="h-3 w-3" />
-                  )}
-                  <span className="font-medium">
-                    {nextTide.type === 'high' ? 'Haute' : 'Basse'}:
-                  </span>
-                  <span>
-                    {new Date(nextTide.time).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
 
         {/* Temperature */}
         <div className="flex items-start gap-3">

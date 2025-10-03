@@ -2,13 +2,13 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getSpotBySlug, getActiveSpots } from '@/lib/data/spots'
 import { getCurrentConditions } from '@/lib/api/forecast'
-import { getTides, getNextTideEvents, getCurrentTideHeight } from '@/lib/api/tides'
-import { getUnifiedForecast, getForecastSourceName } from '@/lib/data/forecast'
+import { TideData, getTides, getNextTideEvents, getCurrentTideHeight } from '@/lib/api/tides'
+import { ForecastData, getForecast, getForecastSourceName } from '@/lib/data/forecast'
 import { isFavorite } from '@/lib/data/favorites'
 import { createClient } from '@/lib/supabase/server'
 import { VideoPlayer } from '@/components/video-player'
 import { ConditionsBanner } from '@/components/conditions-banner'
-import { TideChart } from '@/components/tide-chart'
+import { TideInfo } from '@/components/tide-info'
 import { ForecastTable } from '@/components/forecast-table'
 import { FavoriteButton } from '@/components/favorite-button'
 import { ShareButton } from '@/components/share-button'
@@ -78,21 +78,25 @@ export default async function SpotPage({ params }: SpotPageProps) {
 
   // Fetch forecast and tides data with error handling
   let forecastData
-  let tides
+  let tides: TideData = { events: [], hourly: [] }
   let forecastError: string | null = null
   let forecastSource = 'Non disponible'
-  
+
   try {
-    [forecastData, tides] = await Promise.all([
-      getUnifiedForecast(spot),
-      getTides(spot.latitude, spot.longitude),
-    ])
+    forecastData = await getForecast(spot)
     forecastSource = getForecastSourceName(forecastData.meta.source)
+
+    // Tides are included in Stormglass data, otherwise fetch them
+    if (forecastData.tides) {
+      tides = { events: forecastData.tides, hourly: [] } // Assuming hourly tides aren't needed for now
+    } else {
+      // Fallback for Open-Meteo
+      tides = await getTides(spot.latitude, spot.longitude)
+    }
   } catch (error) {
     console.error(`Forecast error for ${spot.name}:`, error)
     forecastError = error instanceof Error ? error.message : 'Erreur de chargement des prévisions'
-    // Create empty data to prevent crashes
-    forecastData = { hourly: [], daily: [] }
+    forecastData = { hourly: [], daily: [], tides: [], meta: { source: 'open-meteo' } } as ForecastData
     tides = { events: [], hourly: [] }
   }
 
@@ -256,13 +260,12 @@ export default async function SpotPage({ params }: SpotPageProps) {
           <ConditionsBanner
             current={current}
             tideHeight={currentTideHeight}
-            tideCoefficient={tideCoefficient}
             nextTides={nextTides}
           />
         )}
 
-        {/* Tide Chart */}
-        <TideChart tides={tides} sunData={forecastData.daily[0]} hours={12} />
+        {/* Tide Info */}
+        <TideInfo tides={tides} sunData={forecastData.daily[0]} tideCoefficient={tideCoefficient} />
 
         {/* Forecast Table */}
         <div className="space-y-4">
