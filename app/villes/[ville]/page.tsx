@@ -40,12 +40,14 @@ export default async function CityPage({ params }: CityPageProps) {
 
   const spots = await getSpotsByCity(cityName)
 
+  const sortedSpots = [...spots].sort((a, b) => (b.latitude ?? -90) - (a.latitude ?? -90));
+
   return (
     <div className="container py-8">
       <h1 className="text-4xl font-bold mb-8">Webcams à {cityName}</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {spots.map(spot => (
+        {sortedSpots.map(spot => (
           <div key={spot.id}>
             <h2 className="text-xl font-bold mb-2 text-center">
               <Link href={`/spots/${spot.slug}`} className="hover:text-primary transition-colors">
