@@ -49,7 +49,7 @@ export default async function CityPage({ params }: CityPageProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {sortedSpots.map(spot => (
           <div key={spot.id}>
-            <h2 className="text-xl font-bold mb-2 text-center">
+            <h2 className="text-xl font-bold mb-2 text-center truncate">
               <Link href={`/spots/${spot.slug}`} className="hover:text-primary transition-colors">
                 {spot.name.replace(`${cityName} - `, '')}
               </Link>

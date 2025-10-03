@@ -1,9 +1,10 @@
 import Link from 'next/link'
-import { Waves, Heart, User, Shield } from 'lucide-react'
+import { Waves, Heart, User, Shield, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/server'
 import { isAdmin } from '@/lib/auth/admin'
 import { config } from '@/lib/config'
+import { MobileNav } from './mobile-nav'
 
 export async function Header() {
   const supabase = await createClient()
@@ -13,7 +14,8 @@ export async function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2 md:gap-6">
+          <MobileNav user={user} />
           <Link href="/" className="flex items-center gap-2 font-bold text-xl">
             <Waves className="h-6 w-6 text-primary" />
             <span className="hidden sm:inline">{config.siteName}</span>
@@ -23,8 +25,9 @@ export async function Header() {
             <Link href="/spots" className="text-sm font-medium hover:text-primary transition-colors">
               Spots
             </Link>
-            <Link href="/villes" className="text-sm font-medium hover:text-primary transition-colors">
-              Voir par villes
+            <Link href="/villes" className="flex items-center gap-1 text-sm font-medium hover:text-primary transition-colors">
+              <MapPin className="h-5 w-5" />
+              <span className="hidden sm:inline">Voir par villes</span>
             </Link>
             {user && (
               <Link href="/favorites" className="text-sm font-medium hover:text-primary transition-colors">
