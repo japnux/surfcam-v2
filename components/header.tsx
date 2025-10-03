@@ -23,6 +23,9 @@ export async function Header() {
             <Link href="/spots" className="text-sm font-medium hover:text-primary transition-colors">
               Spots
             </Link>
+            <Link href="/villes" className="text-sm font-medium hover:text-primary transition-colors">
+              Voir par villes
+            </Link>
             {user && (
               <Link href="/favorites" className="text-sm font-medium hover:text-primary transition-colors">
                 Favoris

@@ -98,6 +98,78 @@ export async function deleteSpot(id: string) {
   if (error) throw error
 }
 
+export async function getCitiesGroupedByRegion() {
+  const supabase = await createServiceClient()
+
+  const { data: spots, error } = await supabase
+    .from('spots')
+    .select('city, region')
+    .eq('is_active', true)
+    .not('city', 'is', null)
+    .not('region', 'is', null)
+
+  if (error) throw error
+
+  // Count spots per city
+  const cityCounts: { [key: string]: { region: string; count: number } } = {}
+  for (const spot of spots) {
+    if (spot.city && spot.region) {
+      if (!cityCounts[spot.city]) {
+        cityCounts[spot.city] = { region: spot.region, count: 0 }
+      }
+      cityCounts[spot.city].count++
+    }
+  }
+
+  // Group cities by region
+  const regionGroups: { [key: string]: { name: string; spotCount: number }[] } = {}
+  for (const cityName in cityCounts) {
+    const cityData = cityCounts[cityName]
+    if (!regionGroups[cityData.region]) {
+      regionGroups[cityData.region] = []
+    }
+    regionGroups[cityData.region].push({ name: cityName, spotCount: cityData.count })
+  }
+
+  // Sort cities within each region by spot count
+  for (const region in regionGroups) {
+    regionGroups[region].sort((a, b) => b.spotCount - a.spotCount)
+  }
+
+  return regionGroups
+}
+
+export async function getCities() {
+  const supabase = await createServiceClient()
+  
+  const { data, error } = await supabase
+    .from('spots')
+    .select('city')
+    .eq('is_active', true)
+    .order('city')
+
+  if (error) throw error
+
+  // Remove duplicates and nulls
+  const cities = [...new Set(data.map(item => item.city).filter(Boolean))]
+  
+  return cities
+}
+
+export async function getSpotsByCity(city: string) {
+  const supabase = await createServiceClient()
+  
+  const { data, error } = await supabase
+    .from('spots')
+    .select('*')
+    .eq('city', city)
+    .eq('is_active', true)
+    .order('name')
+
+  if (error) throw error
+  return data
+}
+
 export async function getSpotsByIds(ids: string[]) {
   if (ids.length === 0) return []
   

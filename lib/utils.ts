@@ -52,6 +52,18 @@ export function formatWaveEnergy(kj: number): string {
   return `${Math.round(kj)} kJ`
 }
 
+export function slugify(text: string): string {
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, '-')       // Replace spaces with -
+    .replace(/[\'\"\’]/g, '')    // Remove apostrophes and quotes
+    .replace(/[^\w\-]+/g, '')   // Remove all non-word chars
+    .replace(/\-\-+/g, '-')     // Replace multiple - with single -
+    .replace(/^-+/, '')          // Trim - from start of text
+    .replace(/-+$/, '')         // Trim - from end of text
+}
+
 export function getTidePhase(height: number, nextHigh?: number, nextLow?: number): string {
   if (!nextHigh || !nextLow) return 'Inconnue'
   
