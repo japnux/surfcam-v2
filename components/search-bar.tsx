@@ -14,37 +14,47 @@ interface SearchBarProps {
 
 export function SearchBar({ onSearch, placeholder = 'Rechercher un spot...', initialValue = '' }: SearchBarProps) {
   const [query, setQuery] = useState(initialValue)
+  const [isSearching, setIsSearching] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
-    const debouncedSearch = debounce((searchQuery: string) => {
-      if (onSearch) {
-        onSearch(searchQuery)
-      } else {
-        // Navigate to search page
-        if (searchQuery) {
-          router.push(`/spots?q=${encodeURIComponent(searchQuery)}`)
-        } else {
-          router.push('/spots')
-        }
+    const debouncedSearch = debounce(async (searchQuery: string) => {
+      if (!searchQuery || searchQuery.length < 2) {
+        return
       }
-    }, 300)
 
-    if (query !== initialValue) {
+      setIsSearching(true)
+
+      try {
+        if (onSearch) {
+          onSearch(searchQuery)
+        } else {
+          // Rediriger vers la page de résultats unifiée
+          router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
+        }
+      } catch (error) {
+        console.error('Erreur lors de la recherche:', error)
+        router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
+      } finally {
+        setIsSearching(false)
+      }
+    }, 500)
+
+    if (query !== initialValue && query.length >= 2) {
       debouncedSearch(query)
     }
   }, [query, onSearch, router, initialValue])
 
   return (
     <div className="relative">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${isSearching ? 'text-primary animate-pulse' : 'text-muted-foreground'}`} />
       <Input
         type="search"
         placeholder={placeholder}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className="pl-10"
-        aria-label="Rechercher des spots de surf"
+        aria-label="Rechercher des spots de surf ou des villes"
       />
     </div>
   )

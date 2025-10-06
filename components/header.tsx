@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { isAdmin } from '@/lib/auth/admin'
 import { config } from '@/lib/config'
 import { MobileNav } from './mobile-nav'
+import { SearchBar } from './search-bar'
 
 export async function Header() {
   const supabase = await createClient()
@@ -29,12 +30,11 @@ export async function Header() {
               <MapPin className="h-5 w-5" />
               <span className="hidden sm:inline">Voir par villes</span>
             </Link>
-            {user && (
-              <Link href="/favorites" className="text-sm font-medium hover:text-primary transition-colors">
-                Favoris
-              </Link>
-            )}
           </nav>
+        </div>
+
+        <div className="flex-1 max-w-md mx-4 hidden md:block">
+          <SearchBar placeholder="Rechercher un spot ou une ville..." />
         </div>
 
         <div className="flex items-center gap-2">

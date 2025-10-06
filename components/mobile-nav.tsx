@@ -10,6 +10,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { config } from '@/lib/config'
+import { SearchBar } from './search-bar'
 import type { User } from '@supabase/supabase-js'
 
 interface MobileNavProps {
@@ -33,6 +34,11 @@ export function MobileNav({ user }: MobileNavProps) {
             <Waves className="h-6 w-6 text-primary" />
             <span>{config.siteName}</span>
           </Link>
+
+          <div className="px-2">
+            <SearchBar placeholder="Rechercher un spot ou une ville..." />
+          </div>
+
           <nav className="flex flex-col gap-2">
             <Link href="/spots" className="flex items-center gap-2 text-lg font-medium hover:text-primary transition-colors" onClick={() => setOpen(false)}>
               <Waves className="h-5 w-5" />
@@ -42,12 +48,6 @@ export function MobileNav({ user }: MobileNavProps) {
               <MapPin className="h-5 w-5" />
               Villes
             </Link>
-            {user && (
-              <Link href="/favorites" className="flex items-center gap-2 text-lg font-medium hover:text-primary transition-colors" onClick={() => setOpen(false)}>
-                <Heart className="h-5 w-5" />
-                Favoris
-              </Link>
-            )}
           </nav>
         </div>
       </SheetContent>

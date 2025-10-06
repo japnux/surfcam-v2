@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { getActiveSpots, type Spot } from '@/lib/data/spots'
 import { getUserFavorites } from '@/lib/data/favorites'
 import { SpotCard } from '@/components/spot-card'
+import { FavoriteSpotCard } from '@/components/favorite-spot-card'
 import { SearchBar } from '@/components/search-bar'
 import { config } from '@/lib/config'
 import { createClient } from '@/lib/supabase/server'
@@ -63,32 +64,33 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Mes spots favoris */}
-        {user && favoriteSpots.length > 0 && (
-          <section className="space-y-4">
-            <h2 className="text-2xl font-bold">Mes spots favoris</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {favoriteSpots.map((spot) => (
-                <SpotCard key={spot.id} spot={spot} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Tous les spots actifs */}
+        {/* Spots actifs ou favoris selon l'état de connexion */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold">Spots actifs</h2>
-          
-          {activeSpots.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>Aucun spot disponible pour le moment.</p>
-            </div>
+          {user && favoriteSpots.length > 0 ? (
+            <>
+              <h2 className="text-2xl font-bold">Mes spots favoris</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {favoriteSpots.map((spot) => (
+                  <FavoriteSpotCard key={spot.id} spot={spot} />
+                ))}
+              </div>
+            </>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {activeSpots.map((spot) => (
-                <SpotCard key={spot.id} spot={spot} />
-              ))}
-            </div>
+            <>
+              <h2 className="text-2xl font-bold">Spots actifs</h2>
+
+              {activeSpots.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>Aucun spot disponible pour le moment.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {activeSpots.map((spot) => (
+                    <SpotCard key={spot.id} spot={spot} />
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </section>
       </div>
