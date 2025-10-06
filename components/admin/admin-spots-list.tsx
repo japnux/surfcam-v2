@@ -15,10 +15,20 @@ interface AdminSpotsListProps {
 
 export function AdminSpotsList({ spots }: AdminSpotsListProps) {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'stormglass' | 'open-meteo'>('all')
 
   const filteredSpots = spots.filter((spot) => {
-    if (statusFilter === 'active') return spot.is_active
-    if (statusFilter === 'inactive') return !spot.is_active
+    // Filter by status
+    if (statusFilter === 'active' && !spot.is_active) return false
+    if (statusFilter === 'inactive' && spot.is_active) return false
+
+    // Filter by forecast source
+    if (sourceFilter !== 'all') {
+      const expectedSource = sourceFilter
+      const actualSource = spot.has_daily_forecast ? 'stormglass' : 'open-meteo'
+      if (actualSource !== expectedSource) return false
+    }
+
     return true
   })
 
@@ -28,28 +38,56 @@ export function AdminSpotsList({ spots }: AdminSpotsListProps) {
         <span className="text-sm text-muted-foreground">
           {filteredSpots.length} spot{filteredSpots.length > 1 ? 's' : ''}
         </span>
-        <div className="flex items-center gap-2 border rounded-lg p-1">
-          <Button
-            variant={statusFilter === 'all' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setStatusFilter('all')}
-          >
-            Tous
-          </Button>
-          <Button
-            variant={statusFilter === 'active' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setStatusFilter('active')}
-          >
-            Actifs
-          </Button>
-          <Button
-            variant={statusFilter === 'inactive' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setStatusFilter('inactive')}
-          >
-            Inactifs
-          </Button>
+        <div className="flex items-center gap-2">
+          {/* Status Filter */}
+          <div className="flex items-center gap-2 border rounded-lg p-1">
+            <Button
+              variant={statusFilter === 'all' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setStatusFilter('all')}
+            >
+              Tous
+            </Button>
+            <Button
+              variant={statusFilter === 'active' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setStatusFilter('active')}
+            >
+              Actifs
+            </Button>
+            <Button
+              variant={statusFilter === 'inactive' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setStatusFilter('inactive')}
+            >
+              Inactifs
+            </Button>
+          </div>
+
+          {/* Forecast Source Filter */}
+          <div className="flex items-center gap-2 border rounded-lg p-1">
+            <Button
+              variant={sourceFilter === 'all' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setSourceFilter('all')}
+            >
+              Toutes sources
+            </Button>
+            <Button
+              variant={sourceFilter === 'stormglass' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setSourceFilter('stormglass')}
+            >
+              Stormglass
+            </Button>
+            <Button
+              variant={sourceFilter === 'open-meteo' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setSourceFilter('open-meteo')}
+            >
+              Open-Meteo
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -96,7 +134,7 @@ export function AdminSpotsList({ spots }: AdminSpotsListProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-sm">
                 <div>
                   <span className="text-muted-foreground">Région:</span> {spot.region}
                 </div>
@@ -105,6 +143,9 @@ export function AdminSpotsList({ spots }: AdminSpotsListProps) {
                 </div>
                 <div>
                   <span className="text-muted-foreground">Type:</span> {spot.cam_type}
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Source:</span> {spot.has_daily_forecast ? 'Stormglass' : 'Open-Meteo'}
                 </div>
                 <div>
                   <span className="text-muted-foreground">Slug:</span> {spot.slug}

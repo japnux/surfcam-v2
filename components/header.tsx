@@ -28,7 +28,7 @@ export async function Header() {
             </Link>
             <Link href="/villes" className="flex items-center gap-1 text-sm font-medium hover:text-primary transition-colors">
               <MapPin className="h-5 w-5" />
-              <span className="hidden sm:inline">Voir par villes</span>
+              <span className="hidden sm:inline">Par villes</span>
             </Link>
           </nav>
         </div>
