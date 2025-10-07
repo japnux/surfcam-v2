@@ -55,14 +55,15 @@ export function ForecastTable({ hourly, tideHourly, tideEvents, daily, hoursToSh
               return Math.abs(tideTime.getTime() - date.getTime()) < 30 * 60 * 1000 // Within 30 minutes
             })
             
-            // Determine if tide is rising or falling
-            const nextTideData = index < displayData.length - 1 ? tideHourly?.find(t => {
-              const nextDate = new Date(displayData[index + 1].time)
-              const tideTime = new Date(t.time)
-              return Math.abs(tideTime.getTime() - nextDate.getTime()) < 30 * 60 * 1000
-            }) : null
-            
-            const isTideRising = tideData && nextTideData ? nextTideData.height > tideData.height : null
+            // Determine if tide is rising or falling based on next tide event
+            const isTideRising = tideData && tideEvents ? (() => {
+              const currentTime = date.getTime()
+              // Find the next tide event (high or low)
+              const nextEvent = tideEvents.find(e => new Date(e.time).getTime() > currentTime)
+              if (!nextEvent) return null
+              // If next event is high tide, we're rising. If low tide, we're falling.
+              return nextEvent.type === 'high'
+            })() : null
             const timeStr = date.toLocaleTimeString('fr-FR', {
               hour: '2-digit',
               minute: '2-digit',

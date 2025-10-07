@@ -9,7 +9,26 @@ import { createClient } from '@/lib/supabase/server'
 import { VideoPlayer } from '@/components/video-player'
 import { ConditionsBanner } from '@/components/conditions-banner'
 import { TideInfo } from '@/components/tide-info'
-import { ForecastTable } from '@/components/forecast-table'
+import dynamic from 'next/dynamic'
+
+// Lazy load the forecast table for better FCP
+const ForecastTable = dynamic(() => import('@/components/forecast-table').then(mod => ({ default: mod.ForecastTable })), {
+  loading: () => (
+    <div className="bg-card border border-border rounded-lg overflow-hidden p-8">
+      <div className="animate-pulse space-y-4">
+        <div className="h-8 bg-muted rounded w-full"></div>
+        <div className="h-8 bg-muted rounded w-full"></div>
+        <div className="h-8 bg-muted rounded w-full"></div>
+        <div className="h-8 bg-muted rounded w-full"></div>
+        <div className="h-8 bg-muted rounded w-full"></div>
+        <div className="h-8 bg-muted rounded w-full"></div>
+        <div className="h-8 bg-muted rounded w-full"></div>
+        <div className="h-8 bg-muted rounded w-full"></div>
+      </div>
+    </div>
+  ),
+  ssr: false // Don't render on server for faster initial load
+})
 import { getTidesForSpot } from '@/lib/data/tides'
 import { FavoriteButton } from '@/components/favorite-button'
 import { ShareButton } from '@/components/share-button'
@@ -83,11 +102,15 @@ export default async function SpotPage({ params }: SpotPageProps) {
   let forecastSource = 'Non disponible'
 
   try {
-    forecastData = await getForecast(spot)
+    // Parallelize forecast and tides fetching for better performance
+    const [forecast, tidesData] = await Promise.all([
+      getForecast(spot),
+      getTides(spot.latitude, spot.longitude, spot.id)
+    ])
+    
+    forecastData = forecast
     forecastSource = getForecastSourceName(forecastData.meta.source)
-
-    // Always fetch full tide data (events + hourly sea level)
-    tides = await getTides(spot.latitude, spot.longitude, spot.id)
+    tides = tidesData
   } catch (error) {
     console.error(`Forecast error for ${spot.name}:`, error)
     forecastError = error instanceof Error ? error.message : 'Erreur de chargement des prévisions'
