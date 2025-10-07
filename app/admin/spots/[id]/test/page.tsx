@@ -48,17 +48,14 @@ export default async function TestSpotPage({ params }: TestSpotPageProps) {
   if (error || !spot) {
     notFound()
   }
-  
-  // Type assertion for spot data
-  const spotData = spot as any
 
   // Fetch forecast and tides
   let forecast, tides, current, nextTides, currentTideHeight
   let forecastError = null
   
   try {
-    forecast = await getForecast(spotData.latitude, spotData.longitude)
-    tides = await getTides(spotData.latitude, spotData.longitude)
+    forecast = await getForecast(spot.latitude, spot.longitude)
+    tides = await getTides(spot.latitude, spot.longitude)
     current = getCurrentConditions(forecast)
     nextTides = getNextTideEvents(tides, 2)
     currentTideHeight = getCurrentTideHeight(tides)
@@ -74,28 +71,28 @@ export default async function TestSpotPage({ params }: TestSpotPageProps) {
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
-        <h1 className="text-4xl font-bold">Test: {spotData.name}</h1>
+        <h1 className="text-4xl font-bold">Test: {spot.name}</h1>
       </div>
 
       <div className="bg-card border border-border rounded-lg p-6 space-y-2">
         <h2 className="text-xl font-semibold">Informations du spot</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-          <div><strong>Slug:</strong> {spotData.slug}</div>
-          <div><strong>Région:</strong> {spotData.region}</div>
-          <div><strong>Ville:</strong> {spotData.city || '-'}</div>
-          <div><strong>Latitude:</strong> {spotData.latitude}</div>
-          <div><strong>Longitude:</strong> {spotData.longitude}</div>
-          <div><strong>Type cam:</strong> {spotData.cam_type}</div>
-          <div className="col-span-2"><strong>URL:</strong> {spotData.cam_url}</div>
+          <div><strong>Slug:</strong> {spot.slug}</div>
+          <div><strong>Région:</strong> {spot.region}</div>
+          <div><strong>Ville:</strong> {spot.city || '-'}</div>
+          <div><strong>Latitude:</strong> {spot.latitude}</div>
+          <div><strong>Longitude:</strong> {spot.longitude}</div>
+          <div><strong>Type cam:</strong> {spot.cam_type}</div>
+          <div className="col-span-2"><strong>URL:</strong> {spot.cam_url}</div>
         </div>
       </div>
 
       <div className="space-y-4">
         <h2 className="text-2xl font-semibold">Test du flux vidéo</h2>
         <VideoPlayer
-          src={spotData.cam_url}
-          type={spotData.cam_type}
-          spotName={spotData.name}
+          src={spot.cam_url}
+          type={spot.cam_type}
+          spotName={spot.name}
         />
       </div>
 

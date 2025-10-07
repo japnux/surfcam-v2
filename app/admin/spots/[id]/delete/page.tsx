@@ -37,9 +37,6 @@ export default async function DeleteSpotPage({ params }: DeleteSpotPageProps) {
   if (error || !spot) {
     notFound()
   }
-  
-  // Type assertion for spot data
-  const spotData = spot as any
 
   return (
     <div className="container max-w-2xl py-8 space-y-8">
@@ -50,16 +47,16 @@ export default async function DeleteSpotPage({ params }: DeleteSpotPageProps) {
           Êtes-vous sûr de vouloir supprimer ce spot ?
         </p>
         <div className="space-y-2 text-sm">
-          <p><strong>Nom:</strong> {spotData.name}</p>
-          <p><strong>Slug:</strong> {spotData.slug}</p>
-          <p><strong>Région:</strong> {spotData.region}</p>
+          <p><strong>Nom:</strong> {spot.name}</p>
+          <p><strong>Slug:</strong> {spot.slug}</p>
+          <p><strong>Région:</strong> {spot.region}</p>
         </div>
         <p className="text-sm text-muted-foreground">
           Cette action est irréversible. Tous les favoris associés seront également supprimés.
         </p>
       </div>
 
-      <DeleteSpotForm spotId={id} spotName={spotData.name} />
+      <DeleteSpotForm spotId={id} spotName={spot.name} />
     </div>
   )
 }
