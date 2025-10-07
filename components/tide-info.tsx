@@ -1,22 +1,45 @@
-'use client'
-
 import { TideData } from '@/lib/api/tides'
 import { DailyData } from '@/lib/api/forecast'
+import { getTidesForSpot } from '@/lib/data/tides'
 import { ArrowUp, ArrowDown, Sunrise, Sunset, Droplets } from 'lucide-react'
 
 interface TideInfoProps {
+  spotId: string
   tides: TideData
   sunData?: DailyData
   tideCoefficient?: number | null
 }
 
-export function TideInfo({ tides, sunData, tideCoefficient }: TideInfoProps) {
+export async function TideInfo({ spotId, tides, sunData, tideCoefficient }: TideInfoProps) {
+  // Get cached tide data from mareespeche.com
+  const cachedTides = await getTidesForSpot(spotId);
+  
   const now = new Date()
   
+  // Use cached tides if available, otherwise fallback to API tides
+  const tidesData = cachedTides?.tides || tides.events
+  
   // Get next 2 tide events
-  const nextTides = tides.events
-    .filter(e => new Date(e.time) > now)
-    .slice(0, 2)
+  const nextTides = cachedTides?.tides 
+    ? cachedTides.tides.filter(t => {
+        const [hours, minutes] = t.time.split('h').map(Number)
+        const tideTime = new Date()
+        tideTime.setHours(hours, minutes, 0, 0)
+        return tideTime > now
+      }).slice(0, 2).map(t => ({
+        time: (() => {
+          const [hours, minutes] = t.time.split('h').map(Number)
+          const date = new Date()
+          date.setHours(hours, minutes, 0, 0)
+          return date.toISOString()
+        })(),
+        type: t.type,
+        height: 0 // Not used in display
+      }))
+    : tides.events.filter(e => new Date(e.time) > now).slice(0, 2)
+  
+  // Use coefficient from cached data if available
+  const coefficient = cachedTides?.coefficient ? parseInt(cachedTides.coefficient) : tideCoefficient
   
   // Determine next sun event (sunrise or sunset)
   const nextSunEvent = (() => {
@@ -70,11 +93,11 @@ export function TideInfo({ tides, sunData, tideCoefficient }: TideInfoProps) {
         )}
         
         {/* Tide Coefficient */}
-        {tideCoefficient && (
+        {coefficient && (
           <div className="flex items-center gap-2">
             <Droplets className="h-5 w-5 text-cyan-500" />
             <div>
-              <div className="text-2xl font-bold">{tideCoefficient}</div>
+              <div className="text-2xl font-bold">{coefficient}</div>
             </div>
           </div>
         )}

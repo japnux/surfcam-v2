@@ -10,11 +10,11 @@ import { VideoPlayer } from '@/components/video-player'
 import { ConditionsBanner } from '@/components/conditions-banner'
 import { TideInfo } from '@/components/tide-info'
 import { ForecastTable } from '@/components/forecast-table'
+import { getTidesForSpot } from '@/lib/data/tides'
 import { FavoriteButton } from '@/components/favorite-button'
 import { ShareButton } from '@/components/share-button'
-import { CommentSection } from '@/components/comment-section'
 import { config } from '@/lib/config'
-import { MapPin, Info } from 'lucide-react'
+import { Info } from 'lucide-react'
 
 export const revalidate = 900 // 15 minutes
 
@@ -86,13 +86,8 @@ export default async function SpotPage({ params }: SpotPageProps) {
     forecastData = await getForecast(spot)
     forecastSource = getForecastSourceName(forecastData.meta.source)
 
-    // Tides are included in Stormglass data, otherwise fetch them
-    if (forecastData.tides) {
-      tides = { events: forecastData.tides, hourly: [] } // Assuming hourly tides aren't needed for now
-    } else {
-      // Fallback for Open-Meteo
-      tides = await getTides(spot.latitude, spot.longitude)
-    }
+    // Always fetch full tide data (events + hourly sea level)
+    tides = await getTides(spot.latitude, spot.longitude, spot.id)
   } catch (error) {
     console.error(`Forecast error for ${spot.name}:`, error)
     forecastError = error instanceof Error ? error.message : 'Erreur de chargement des prévisions'
@@ -124,13 +119,6 @@ export default async function SpotPage({ params }: SpotPageProps) {
   const { data: { user } } = await supabase.auth.getUser()
   const userFavorite = user ? await isFavorite(user.id, spot.id) : false
 
-  // Get recent comments count (last 48h)
-  const { count: recentCommentsCount } = await supabase
-    .from('spot_comments')
-    .select('*', { count: 'exact', head: true })
-    .eq('spot_id', spot.id)
-    .eq('is_archived', false)
-    .gte('created_at', new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString())
 
   // JSON-LD structured data
   const jsonLd = {
@@ -175,17 +163,6 @@ export default async function SpotPage({ params }: SpotPageProps) {
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
             <h1 className="text-4xl font-bold">{spot.name}</h1>
-            {recentCommentsCount !== null && recentCommentsCount > 0 && (
-              <a 
-                href="#commentaires" 
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <MapPin className="h-4 w-4" />
-                <span className="underline decoration-dotted underline-offset-4">
-                  {recentCommentsCount} commentaire{recentCommentsCount > 1 ? 's' : ''} récemment (voir)
-                </span>
-              </a>
-            )}
           </div>
           {user && (
             <FavoriteButton
@@ -265,7 +242,12 @@ export default async function SpotPage({ params }: SpotPageProps) {
         )}
 
         {/* Tide Info */}
-        <TideInfo tides={tides} sunData={forecastData.daily[0]} tideCoefficient={tideCoefficient} />
+        <TideInfo 
+          spotId={spot.id}
+          tides={tides} 
+          sunData={forecastData.daily[0]} 
+          tideCoefficient={tideCoefficient} 
+        />
 
         {/* Forecast Table */}
         <div className="space-y-4">
@@ -280,13 +262,14 @@ export default async function SpotPage({ params }: SpotPageProps) {
           <div className="bg-card border border-border rounded-lg overflow-hidden">
             <ForecastTable
               hourly={forecastData.hourly}
+              tideHourly={tides.hourly}
+              tideEvents={tides.events}
+              daily={forecastData.daily}
               hoursToShow={48}
             />
           </div>
         </div>
 
-        {/* Community Comments */}
-        <CommentSection spotId={spot.id} />
 
         {/* License Credit */}
         {spot.license_credit && (

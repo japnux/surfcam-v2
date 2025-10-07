@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "scrape": "tsx scripts/scraper.ts"
+    "scrape": "tsx scripts/scraper.ts",
+    "update-shom": "tsx scripts/update-shom-data.ts"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.0.4",
@@ -37,6 +38,7 @@
     "@types/react-dom": "^18.3.1",
     "autoprefixer": "^10.4.21",
     "cheerio": "^1.0.0",
+    "dotenv": "^16.4.5",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.18",
     "postcss": "^8.4.49",

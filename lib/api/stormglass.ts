@@ -44,64 +44,101 @@ export interface StormglassTides {
   }
 }
 
+// Stormglass API keys with fallback
+const STORMGLASS_API_KEYS = [
+  config.stormglass.apiKey,
+  process.env.STORMGLASS_API_KEY_2,
+].filter(Boolean) as string[]
+
 /**
- * Fetch weather and wave forecast from Stormglass API
+ * Fetch weather and wave forecast from Stormglass API with fallback keys
  */
 export async function getStormglassForecast(
   lat: number,
   lng: number
 ): Promise<StormglassForecast | null> {
-  const apiKey = config.stormglass.apiKey
-
-  if (!apiKey) {
-    console.error('Stormglass API key is not configured')
+  if (STORMGLASS_API_KEYS.length === 0) {
+    console.error('No Stormglass API keys configured')
     return null
   }
 
-  try {
-    const params = new URLSearchParams({
-      lat: lat.toString(),
-      lng: lng.toString(),
-      params: [
-        'airTemperature',
-        'waterTemperature',
-        'windSpeed',
-        'windDirection',
-        'gust',
-        'waveHeight',
-        'waveDirection',
-        'wavePeriod',
-        // Note: swellPower and waveEnergy may not be available in all plans
-        // Uncomment if available in your plan:
-        // 'swellPower',
-        // 'waveEnergy',
-      ].join(','),
-      source: 'sg', // Use only Stormglass data
-    })
+  // Base parameters (available in all plans)
+  const baseParams = [
+    'airTemperature',
+    'waterTemperature',
+    'windSpeed',
+    'windDirection',
+    'gust',
+    'waveHeight',
+    'waveDirection',
+    'wavePeriod',
+  ]
+  
+  // Premium parameters (may not be available in all plans)
+  const premiumParams = ['swellPower', 'waveEnergy']
 
-    const response = await fetch(
-      `${config.stormglass.baseUrl}/weather/point?${params.toString()}`,
-      {
-        headers: {
-          Authorization: apiKey,
-        },
-        next: {
-          revalidate: 86400, // Cache for 24 hours
-        },
+  // Try each API key until one works
+  for (let i = 0; i < STORMGLASS_API_KEYS.length; i++) {
+    const apiKey = STORMGLASS_API_KEYS[i]
+    console.log(`🔑 Trying Stormglass API key ${i + 1}/${STORMGLASS_API_KEYS.length}`)
+    
+    // Try with premium params first, then fallback to base params
+    const paramSets = [
+      [...baseParams, ...premiumParams],
+      baseParams,
+    ]
+    
+    for (const paramSet of paramSets) {
+      try {
+        const params = new URLSearchParams({
+          lat: lat.toString(),
+          lng: lng.toString(),
+          params: paramSet.join(','),
+          source: 'sg',
+        })
+        
+        const response = await fetch(
+          `${config.stormglass.baseUrl}/weather/point?${params.toString()}`,
+        {
+          headers: {
+            Authorization: apiKey,
+          },
+          next: {
+            revalidate: 86400, // Cache for 24 hours
+          },
+        }
+      )
+
+        if (response.status === 402) {
+          console.warn(`⚠️  API key ${i + 1} quota exceeded (402), trying next key...`)
+          break // Try next API key
+        }
+        
+        if (response.status === 422 && paramSet.length > baseParams.length) {
+          console.warn(`⚠️  API key ${i + 1} doesn't support premium params, retrying with base params...`)
+          continue // Try with base params
+        }
+        
+        if (!response.ok) {
+          throw new Error(`Stormglass API error: ${response.status} ${response.statusText}`)
+        }
+
+        const data = await response.json()
+        console.log(`✅ Successfully fetched data with API key ${i + 1} (${paramSet.length} params)`)
+        return data
+      } catch (error) {
+        console.error(`❌ Error with API key ${i + 1} (${paramSet.length} params):`, error)
+        if (paramSet.length === baseParams.length) {
+          // Even base params failed, try next key
+          break
+        }
+        // Try with base params
+        continue
       }
-    )
-
-    if (!response.ok) {
-      console.error('Stormglass API error:', response.status, response.statusText)
-      return null
     }
-
-    const data = await response.json()
-    return data
-  } catch (error) {
-    console.error('Error fetching Stormglass forecast:', error)
-    return null
   }
+  
+  return null
 }
 
 /**

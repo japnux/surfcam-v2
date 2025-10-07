@@ -1,4 +1,5 @@
-import { HourlyForecast } from '@/lib/api/forecast'
+import { HourlyForecast, DailyData } from '@/lib/api/forecast'
+import { HourlyTide, TideEvent } from '@/lib/api/tides'
 import {
   formatWaveHeight,
   formatWindSpeed,
@@ -8,12 +9,21 @@ import {
   getWindDirectionArrow,
 } from '@/lib/utils'
 
+function formatWaveEnergy(kj: number | null | undefined): string {
+  if (!kj) return '-'
+  return `${kj.toFixed(1)} kJ/m²`
+}
+import { Sunrise, Sunset, Waves, ArrowUp, ArrowDown } from 'lucide-react'
+
 interface ForecastTableProps {
   hourly: HourlyForecast[]
+  tideHourly?: HourlyTide[]
+  tideEvents?: TideEvent[]
+  daily?: DailyData[]
   hoursToShow?: number
 }
 
-export function ForecastTable({ hourly, hoursToShow = 48 }: ForecastTableProps) {
+export function ForecastTable({ hourly, tideHourly, tideEvents, daily, hoursToShow = 48 }: ForecastTableProps) {
   // Obtenir l'heure courante arrondie à l'heure inférieure (en utilisant le timestamp pour éviter les problèmes de fuseau horaire)
   const now = new Date()
   now.setMinutes(0, 0, 0) // Arrondir à l'heure inférieure
@@ -31,13 +41,28 @@ export function ForecastTable({ hourly, hoursToShow = 48 }: ForecastTableProps) 
             <th className="p-3 text-left font-semibold">Heure</th>
             <th className="p-3 text-left font-semibold">Vent</th>
             <th className="p-3 text-left font-semibold">Vagues</th>
-            <th className="p-3 text-left font-semibold">Eau</th>
-            <th className="p-3 text-left font-semibold">Air</th>
+            <th className="p-3 text-left font-semibold">Marée</th>
+            <th className="p-3 text-left font-semibold">Énergie</th>
           </tr>
         </thead>
         <tbody>
           {displayData.map((hour, index) => {
             const date = new Date(hour.time)
+            
+            // Find corresponding tide height
+            const tideData = tideHourly?.find(t => {
+              const tideTime = new Date(t.time)
+              return Math.abs(tideTime.getTime() - date.getTime()) < 30 * 60 * 1000 // Within 30 minutes
+            })
+            
+            // Determine if tide is rising or falling
+            const nextTideData = index < displayData.length - 1 ? tideHourly?.find(t => {
+              const nextDate = new Date(displayData[index + 1].time)
+              const tideTime = new Date(t.time)
+              return Math.abs(tideTime.getTime() - nextDate.getTime()) < 30 * 60 * 1000
+            }) : null
+            
+            const isTideRising = tideData && nextTideData ? nextTideData.height > tideData.height : null
             const timeStr = date.toLocaleTimeString('fr-FR', {
               hour: '2-digit',
               minute: '2-digit',
@@ -55,6 +80,28 @@ export function ForecastTable({ hourly, hoursToShow = 48 }: ForecastTableProps) 
             // Check if this is a new day (00:00 or first entry)
             const prevDate = index > 0 ? new Date(displayData[index - 1].time) : null
             const isNewDay = !prevDate || prevDate.getDate() !== date.getDate()
+            
+            // Get sunrise/sunset for this day
+            const dayData = daily?.find(d => {
+              const dailyDate = new Date(d.sunrise || d.sunset)
+              return dailyDate.getDate() === date.getDate() && 
+                     dailyDate.getMonth() === date.getMonth()
+            })
+            
+            const sunrise = dayData?.sunrise ? new Date(dayData.sunrise) : null
+            const sunset = dayData?.sunset ? new Date(dayData.sunset) : null
+            
+            // Check if we should show sunrise/sunset in this row
+            const nextHour = index < displayData.length - 1 ? new Date(displayData[index + 1].time) : null
+            const showSunrise = sunrise && date <= sunrise && (!nextHour || nextHour > sunrise)
+            const showSunset = sunset && date <= sunset && (!nextHour || nextHour > sunset)
+            
+            // Check if we should show tide events (high/low) AFTER this row
+            const tideEvent = tideEvents?.find(t => {
+              const tideTime = new Date(t.time)
+              // Show tide event if it occurs between current hour and next hour
+              return date < tideTime && (!nextHour || nextHour >= tideTime)
+            })
 
             return (
               <>
@@ -65,6 +112,37 @@ export function ForecastTable({ hourly, hoursToShow = 48 }: ForecastTableProps) 
                     </td>
                   </tr>
                 )}
+                
+                {/* Sunrise row */}
+                {showSunrise && sunrise && (
+                  <tr key={`sunrise-${sunrise.toISOString()}`} className="bg-orange-500/10 border-y border-orange-500/30">
+                    <td className="p-2 font-medium whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <Sunrise className="h-4 w-4 text-orange-500" />
+                        <span>{sunrise.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                    </td>
+                    <td colSpan={4} className="p-2 text-sm text-muted-foreground">
+                      Lever du soleil
+                    </td>
+                  </tr>
+                )}
+                
+                {/* Sunset row */}
+                {showSunset && sunset && (
+                  <tr key={`sunset-${sunset.toISOString()}`} className="bg-orange-600/10 border-y border-orange-600/30">
+                    <td className="p-2 font-medium whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <Sunset className="h-4 w-4 text-orange-600" />
+                        <span>{sunset.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                    </td>
+                    <td colSpan={4} className="p-2 text-sm text-muted-foreground">
+                      Coucher du soleil
+                    </td>
+                  </tr>
+                )}
+                
                 <tr
                   key={hour.time}
                   className={`border-b border-border hover:bg-accent/50 transition-colors ${
@@ -102,9 +180,72 @@ export function ForecastTable({ hourly, hoursToShow = 48 }: ForecastTableProps) 
                   )}
                 </td>
                 
-                <td className="p-3">{formatTemperature(hour.waterTemp)}</td>
-                <td className="p-3">{formatTemperature(hour.airTemp)}</td>
+                {/* Tide Height */}
+                <td className="p-3">
+                  {tideData ? (
+                    <div className="flex items-center gap-1.5">
+                      {isTideRising !== null && (
+                        <span className={`text-lg ${isTideRising ? 'text-green-400' : 'text-red-400'}`}>
+                          {isTideRising ? '↑' : '↓'}
+                        </span>
+                      )}
+                      <span className="font-semibold text-blue-500">
+                        {tideData.height.toFixed(2)} m
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground text-xs">-</span>
+                  )}
+                </td>
+                
+                {/* Wave Energy */}
+                <td className="p-3">
+                  {hour.waveEnergy ? (
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-semibold text-purple-500">
+                        {formatWaveEnergy(hour.waveEnergy)}
+                      </span>
+                      {hour.swellPower && (
+                        <span className="text-xs text-purple-400">
+                          {formatSwellPower(hour.swellPower)}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground text-xs">-</span>
+                  )}
+                </td>
               </tr>
+              
+              {/* Tide event row (high/low) - AFTER the hourly row */}
+              {tideEvent && (
+                <tr key={`tide-${tideEvent.time}`} className={tideEvent.type === 'high' ? 'bg-blue-500/10 border-y border-blue-500/30' : 'bg-cyan-500/10 border-y border-cyan-500/30'}>
+                  <td className="p-2 font-medium whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-lg ${tideEvent.type === 'high' ? 'text-green-400' : 'text-red-400'}`}>
+                        {tideEvent.type === 'high' ? '↑' : '↓'}
+                      </span>
+                      <span>{new Date(tideEvent.time).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                  </td>
+                  <td colSpan={2} className="p-2 text-sm text-muted-foreground">
+                    {tideEvent.type === 'high' ? 'Marée haute' : 'Marée basse'}
+                  </td>
+                  <td className="p-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className={`text-lg ${tideEvent.type === 'high' ? 'text-green-400' : 'text-red-400'}`}>
+                        {tideEvent.type === 'high' ? '↑' : '↓'}
+                      </span>
+                      <span className="font-semibold text-blue-500">
+                        {tideEvent.height.toFixed(2)} m
+                      </span>
+                    </div>
+                  </td>
+                  <td className="p-2 text-sm text-muted-foreground">
+                    -
+                  </td>
+                </tr>
+              )}
               </>
             )
           })}

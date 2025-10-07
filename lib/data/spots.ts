@@ -1,105 +1,104 @@
-import { createClient } from '@/lib/supabase/server'
-import { createServiceClient } from '@/lib/supabase/server'
-import { Database } from '@/lib/supabase/types'
+import { createClient, createServiceClient } from '@/lib/supabase/server';
+import { Database } from '@/lib/supabase/types';
 
-export type Spot = Database['public']['Tables']['spots']['Row']
-export type SpotInsert = Database['public']['Tables']['spots']['Insert']
-export type SpotUpdate = Database['public']['Tables']['spots']['Update']
+export type Spot = Database['public']['Tables']['spots']['Row'];
+export type SpotInsert = Database['public']['Tables']['spots']['Insert'];
+export type SpotUpdate = Database['public']['Tables']['spots']['Update'];
 
 export async function getActiveSpots(limit?: number) {
-  const supabase = await createServiceClient()
+  const supabase = await createServiceClient();
   
   let query = supabase
     .from('spots')
     .select('*')
     .eq('is_active', true)
-    .order('name')
+    .order('name');
   
   if (limit) {
-    query = query.limit(limit)
+    query = query.limit(limit);
   }
   
-  const { data, error } = await query
+  const { data, error } = await query;
   
-  if (error) throw error
-  return data
+  if (error) throw error;
+  return data;
 }
 
 export async function getSpotBySlug(slug: string) {
-  const supabase = await createServiceClient()
+  const supabase = await createServiceClient();
   
   const { data, error } = await supabase
     .from('spots')
     .select('*')
     .eq('slug', slug)
-    .single()
+    .single();
   
-  if (error) throw error
-  return data
+  if (error) throw error;
+  return data;
 }
 
 export async function getAllSpots() {
-  const supabase = await createClient()
+  const supabase = await createServiceClient();
   
   const { data, error } = await supabase
     .from('spots')
     .select('*')
-    .order('name')
+    .order('name');
   
-  if (error) throw error
-  return data
+  if (error) throw error;
+  return data;
 }
 
 export async function searchSpots(query: string) {
-  const supabase = await createClient()
+  const supabase = await createClient();
   
   const { data, error } = await supabase
-    .rpc('search_spots_unaccent', { search_query: query })
+    .rpc('search_spots_unaccent', { search_query: query });
   
-  if (error) throw error
-  return data as Spot[]
+  if (error) throw error;
+  return data as Spot[];
 }
 
 export async function createSpot(spot: SpotInsert) {
-  const supabase = await createServiceClient()
+  const supabase = await createServiceClient();
   
   const { data, error } = await supabase
     .from('spots')
     .insert(spot)
     .select()
-    .single()
+    .single();
   
-  if (error) throw error
-  return data
+  if (error) throw error;
+  return data;
 }
 
 export async function updateSpot(id: string, spot: SpotUpdate) {
-  const supabase = await createServiceClient()
+  const supabase = await createServiceClient();
   
   const { data, error } = await supabase
     .from('spots')
     .update(spot)
     .eq('id', id)
     .select()
-    .single()
+    .single();
   
-  if (error) throw error
-  return data
+  if (error) throw error;
+  return data;
 }
 
 export async function deleteSpot(id: string) {
-  const supabase = await createServiceClient()
+  const supabase = await createServiceClient();
   
   const { error } = await supabase
     .from('spots')
     .delete()
-    .eq('id', id)
+    .eq('id', id);
   
-  if (error) throw error
+  if (error) throw error;
 }
 
 export async function getCitiesGroupedByRegion() {
-  const supabase = await createServiceClient()
+  const supabase = await createServiceClient();
 
   const { data: spots, error } = await supabase
     .from('spots')
@@ -107,85 +106,85 @@ export async function getCitiesGroupedByRegion() {
     .eq('is_active', true)
     .not('city', 'is', null)
     .not('region', 'is', null)
-    .not('country', 'is', null)
+    .not('country', 'is', null);
 
-  if (error) throw error
+  if (error) throw error;
 
   // Count spots per city and associate with region and country
-  const cityCounts: { [key: string]: { region: string; country: string; count: number } } = {}
+  const cityCounts: { [key: string]: { region: string; country: string; count: number } } = {};
   for (const spot of spots) {
     if (spot.city && spot.region && spot.country) {
       if (!cityCounts[spot.city]) {
-        cityCounts[spot.city] = { region: spot.region, country: spot.country, count: 0 }
+        cityCounts[spot.city] = { region: spot.region, country: spot.country, count: 0 };
       }
-      cityCounts[spot.city].count++
+      cityCounts[spot.city].count++;
     }
   }
 
   // Group regions by country
-  const countryGroups: { [key: string]: { [key: string]: { name: string; spotCount: number }[] } } = {}
+  const countryGroups: { [key: string]: { [key: string]: { name: string; spotCount: number }[] } } = {};
   for (const cityName in cityCounts) {
-    const cityData = cityCounts[cityName]
+    const cityData = cityCounts[cityName];
     if (!countryGroups[cityData.country]) {
-      countryGroups[cityData.country] = {}
+      countryGroups[cityData.country] = {};
     }
     if (!countryGroups[cityData.country][cityData.region]) {
-      countryGroups[cityData.country][cityData.region] = []
+      countryGroups[cityData.country][cityData.region] = [];
     }
-    countryGroups[cityData.country][cityData.region].push({ name: cityName, spotCount: cityData.count })
+    countryGroups[cityData.country][cityData.region].push({ name: cityName, spotCount: cityData.count });
   }
 
   // Sort cities within each region
   for (const country in countryGroups) {
     for (const region in countryGroups[country]) {
-      countryGroups[country][region].sort((a, b) => b.spotCount - a.spotCount)
+      countryGroups[country][region].sort((a, b) => b.spotCount - a.spotCount);
     }
   }
 
-  return countryGroups
+  return countryGroups;
 }
 
 export async function getCities() {
-  const supabase = await createServiceClient()
+  const supabase = await createServiceClient();
   
   const { data, error } = await supabase
     .from('spots')
     .select('city')
     .eq('is_active', true)
-    .order('city')
+    .order('city');
 
-  if (error) throw error
+  if (error) throw error;
 
   // Remove duplicates and nulls
-  const cities = [...new Set(data.map(item => item.city).filter(Boolean))]
+  const cities = [...new Set(data.map(item => item.city).filter(Boolean))];
   
-  return cities
+  return cities;
 }
 
 export async function getSpotsByCity(city: string) {
-  const supabase = await createServiceClient()
+  const supabase = await createServiceClient();
   
   const { data, error } = await supabase
     .from('spots')
     .select('*')
     .eq('city', city)
     .eq('is_active', true)
-    .order('name')
+    .order('name');
 
-  if (error) throw error
-  return data
+  if (error) throw error;
+  return data;
 }
 
 export async function getSpotsByIds(ids: string[]) {
-  if (ids.length === 0) return []
+  if (ids.length === 0) return [];
   
-  const supabase = await createClient()
+  const supabase = await createClient();
   
   const { data, error } = await supabase
     .from('spots')
     .select('*')
-    .in('id', ids)
+    .in('id', ids);
   
-  if (error) throw error
-  return data
+  if (error) throw error;
+  return data;
 }
