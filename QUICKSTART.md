@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-Get your GoSurf Webcams app running in minutes!
+Get your No Bueno Webcams app running in minutes!
 
 ## 1. Install Dependencies
 
@@ -45,7 +45,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
 
 # Site
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
-NEXT_PUBLIC_SITE_NAME="GoSurf Webcams"
+NEXT_PUBLIC_SITE_NAME="No Bueno Webcams"
 
 # APIs (leave as-is)
 OPEN_METEO_WEATHER_URL=https://api.open-meteo.com/v1/forecast

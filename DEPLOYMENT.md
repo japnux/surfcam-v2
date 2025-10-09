@@ -36,7 +36,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app
-NEXT_PUBLIC_SITE_NAME=GoSurf Webcams
+NEXT_PUBLIC_SITE_NAME=No Bueno Webcams
 OPEN_METEO_WEATHER_URL=https://api.open-meteo.com/v1/forecast
 OPEN_METEO_MARINE_URL=https://marine-api.open-meteo.com/v1/marine
 FORECAST_CACHE_TTL=900
@@ -204,4 +204,4 @@ For high traffic:
 
 ---
 
-**Your GoSurf Webcams app is now live! 🌊🏄‍♂️**
+**Your No Bueno Webcams app is now live! 🌊🏄‍♂️**

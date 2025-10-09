@@ -23,7 +23,7 @@ export default async function SignupPage() {
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold">Créer un compte</h1>
           <p className="text-muted-foreground">
-            Rejoignez GoSurf pour suivre vos spots préférés
+            Rejoignez No Bueno Webcams pour suivre vos spots préférés
           </p>
         </div>
         
