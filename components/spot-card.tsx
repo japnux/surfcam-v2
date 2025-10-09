@@ -1,10 +1,10 @@
 import Link from 'next/link'
-import { Spot } from '@/lib/data/spots'
+import { SpotPreview } from '@/lib/data/spots'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Activity } from 'lucide-react'
 
 interface SpotCardProps {
-  spot: Spot
+  spot: SpotPreview
   showFavorite?: boolean
 }
 

@@ -6,20 +6,24 @@ import { TideData, getTides, getNextTideEvents, getCurrentTideHeight } from '@/l
 import { ForecastData, getForecast, getForecastSourceName } from '@/lib/data/forecast'
 import { isFavorite } from '@/lib/data/favorites'
 import { createClient } from '@/lib/supabase/server'
-import { VideoPlayer } from '@/components/video-player'
-import { ConditionsBanner } from '@/components/conditions-banner'
-import { TideInfo } from '@/components/tide-info'
+import { VideoPlayer } from '@/components/video-player-lazy'
 import dynamic from 'next/dynamic'
 
-// Lazy load the forecast table for better FCP
+// Lazy load heavy components for better FCP
+const ConditionsBanner = dynamic(() => import('@/components/conditions-banner').then(mod => ({ default: mod.ConditionsBanner })), {
+  loading: () => <div className="h-32 bg-muted animate-pulse rounded-lg" />,
+  ssr: true
+})
+
+const TideInfo = dynamic(() => import('@/components/tide-info').then(mod => ({ default: mod.TideInfo })), {
+  loading: () => <div className="h-64 bg-muted animate-pulse rounded-lg" />,
+  ssr: true
+})
+
 const ForecastTable = dynamic(() => import('@/components/forecast-table').then(mod => ({ default: mod.ForecastTable })), {
   loading: () => (
     <div className="bg-card border border-border rounded-lg overflow-hidden p-8">
       <div className="animate-pulse space-y-4">
-        <div className="h-8 bg-muted rounded w-full"></div>
-        <div className="h-8 bg-muted rounded w-full"></div>
-        <div className="h-8 bg-muted rounded w-full"></div>
-        <div className="h-8 bg-muted rounded w-full"></div>
         <div className="h-8 bg-muted rounded w-full"></div>
         <div className="h-8 bg-muted rounded w-full"></div>
         <div className="h-8 bg-muted rounded w-full"></div>
@@ -35,13 +39,14 @@ import { ShareButton } from '@/components/share-button'
 import { config } from '@/lib/config'
 import { Info } from 'lucide-react'
 
-export const revalidate = 900 // 15 minutes
+export const revalidate = 1800 // 30 minutes - optimisation performance
 
 interface SpotPageProps {
   params: Promise<{ slug: string }>
 }
 
 export async function generateStaticParams() {
+  // Optimisation: utiliser getAllSpotsForSitemap qui est plus léger
   const spots = await getActiveSpots()
   return spots.map((spot) => ({
     slug: spot.slug,
@@ -102,18 +107,30 @@ export default async function SpotPage({ params }: SpotPageProps) {
   let forecastSource = 'Non disponible'
 
   try {
-    // Parallelize forecast and tides fetching for better performance
-    const [forecast, tidesData] = await Promise.all([
+    // Optimisation: paralléliser les requêtes avec Promise.allSettled pour continuer même si une échoue
+    const [forecastResult, tidesResult] = await Promise.allSettled([
       getForecast(spot),
       getTides(spot.latitude, spot.longitude, spot.id)
     ])
     
-    forecastData = forecast
-    forecastSource = getForecastSourceName(forecastData.meta.source)
-    tides = tidesData
+    if (forecastResult.status === 'fulfilled') {
+      forecastData = forecastResult.value
+      forecastSource = getForecastSourceName(forecastData.meta.source)
+    } else {
+      console.error(`Forecast error for ${spot.name}:`, forecastResult.reason)
+      forecastError = 'Erreur de chargement des prévisions'
+      forecastData = { hourly: [], daily: [], tides: [], meta: { source: 'open-meteo' } } as ForecastData
+    }
+    
+    if (tidesResult.status === 'fulfilled') {
+      tides = tidesResult.value
+    } else {
+      console.error(`Tides error for ${spot.name}:`, tidesResult.reason)
+      tides = { events: [], hourly: [] }
+    }
   } catch (error) {
-    console.error(`Forecast error for ${spot.name}:`, error)
-    forecastError = error instanceof Error ? error.message : 'Erreur de chargement des prévisions'
+    console.error(`Unexpected error for ${spot.name}:`, error)
+    forecastError = 'Erreur inattendue'
     forecastData = { hourly: [], daily: [], tides: [], meta: { source: 'open-meteo' } } as ForecastData
     tides = { events: [], hourly: [] }
   }

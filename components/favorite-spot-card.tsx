@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Spot } from '@/lib/data/spots'
-import { VideoPlayer } from '@/components/video-player'
+import { VideoPlayer } from '@/components/video-player-lazy'
 
 interface FavoriteSpotCardProps {
   spot: Spot

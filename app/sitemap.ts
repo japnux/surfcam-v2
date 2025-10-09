@@ -1,13 +1,13 @@
 import { MetadataRoute } from 'next'
-import { getActiveSpots } from '@/lib/data/spots'
+import { getAllSpotsForSitemap } from '@/lib/data/spots'
 import { config } from '@/lib/config'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const spots = await getActiveSpots()
+  const spots = await getAllSpotsForSitemap()
 
   const spotUrls = spots.map((spot) => ({
     url: `${config.siteUrl}/spots/${spot.slug}`,
-    lastModified: new Date(spot.updated_at),
+    lastModified: spot.updated_at ? new Date(spot.updated_at) : new Date(),
     changeFrequency: 'daily' as const,
     priority: 0.8,
   }))

@@ -5,12 +5,16 @@ export type Spot = Tables<'spots'>;
 export type SpotInsert = TablesInsert<'spots'>;
 export type SpotUpdate = TablesUpdate<'spots'>;
 
-export async function getActiveSpots(limit?: number) {
+// Type pour les spots avec champs limités (optimisation)
+export type SpotPreview = Pick<Spot, 'id' | 'name' | 'slug' | 'break_type' | 'level'>;
+
+export async function getActiveSpots(limit?: number): Promise<SpotPreview[]> {
   const supabase = await createServiceClient();
   
+  // Optimisation: sélectionner uniquement les champs nécessaires pour la page d'accueil
   let query = supabase
     .from('spots')
-    .select('*')
+    .select('id, name, slug, break_type, level')
     .eq('is_active', true)
     .order('name');
   
@@ -21,7 +25,7 @@ export async function getActiveSpots(limit?: number) {
   const { data, error } = await query;
   
   if (error) throw error;
-  return data;
+  return data as SpotPreview[];
 }
 
 export async function getSpotBySlug(slug: string) {
@@ -43,6 +47,20 @@ export async function getAllSpots() {
   const { data, error } = await supabase
     .from('spots')
     .select('*')
+    .order('name');
+  
+  if (error) throw error;
+  return data;
+}
+
+// Pour le sitemap - récupère uniquement les champs nécessaires
+export async function getAllSpotsForSitemap() {
+  const supabase = await createServiceClient();
+  
+  const { data, error } = await supabase
+    .from('spots')
+    .select('slug, updated_at')
+    .eq('is_active', true)
     .order('name');
   
   if (error) throw error;
@@ -161,18 +179,22 @@ export async function getCities() {
   return cities;
 }
 
-export async function getSpotsByCity(city: string): Promise<Spot[]> {
+// Type pour les spots par ville (optimisation)
+export type SpotCity = Pick<Spot, 'id' | 'name' | 'slug' | 'cam_url' | 'cam_type' | 'latitude'>;
+
+export async function getSpotsByCity(city: string): Promise<SpotCity[]> {
   const supabase = await createServiceClient();
   
+  // Optimisation: sélectionner uniquement les champs nécessaires pour la page ville
   const { data, error } = await supabase
     .from('spots')
-    .select('*')
+    .select('id, name, slug, cam_url, cam_type, latitude')
     .eq('city', city)
     .eq('is_active', true)
     .order('name');
 
   if (error) throw error;
-  return data ?? [];
+  return data as SpotCity[] ?? [];
 }
 
 export async function getSpotsByIds(ids: string[]) {

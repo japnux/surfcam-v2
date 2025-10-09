@@ -4,9 +4,10 @@ import type { Spot } from './spots'
 export async function getUserFavorites(userId: string, activeOnly: boolean = false): Promise<Spot[]> {
   const supabase = await createClient()
   
+  // Optimisation: sélectionner uniquement les champs nécessaires
   let query = supabase
     .from('favorites')
-    .select('spot_id, spots(*)')
+    .select('spot_id, spots(id, name, slug, cam_url, cam_type)')
     .eq('user_id', userId)
   
   if (activeOnly) {

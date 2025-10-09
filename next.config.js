@@ -12,6 +12,21 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '2mb',
     },
+    optimizePackageImports: ['lucide-react'], // Tree-shake lucide icons
+  },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production', // Retire les console.log en prod
+  },
+  // Optimisation du bundle
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Optimisations côté client
+      config.optimization = {
+        ...config.optimization,
+        moduleIds: 'deterministic',
+      }
+    }
+    return config
   },
 }
 

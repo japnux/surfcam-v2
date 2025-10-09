@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { getActiveSpots, type Spot } from '@/lib/data/spots'
+import { getActiveSpots, type Spot, type SpotPreview } from '@/lib/data/spots'
 import { getUserFavorites } from '@/lib/data/favorites'
 import { SpotCard } from '@/components/spot-card'
 import { FavoriteSpotCard } from '@/components/favorite-spot-card'
@@ -12,14 +12,14 @@ export const metadata: Metadata = {
   description: 'Découvrez les meilleurs spots de surf avec webcam en direct et prévisions détaillées.',
 }
 
-export const revalidate = 900 // 15 minutes
+export const revalidate = 3600 // 1 heure - optimisation performance
 
 export default async function HomePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
   let favoriteSpots: Spot[] = []
-  const activeSpots: Spot[] = await getActiveSpots(config.homeSpotCount)
+  const activeSpots: SpotPreview[] = await getActiveSpots(config.homeSpotCount)
   
   if (user) {
     // Si l'utilisateur est connecté, récupérer ses favoris actifs
