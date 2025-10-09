@@ -295,7 +295,17 @@ export default async function SpotPage({ params }: SpotPageProps) {
             <h2 className="text-2xl font-bold">Prévisions horaires (48h)</h2>
             <span className="text-sm text-muted-foreground">
               Source: {forecastSource}
-              {forecastData.meta?.fromCache && ' (cache)'}
+              {forecastData.meta?.fromCache && forecastData.meta?.cached_at && (
+                <span className="ml-1">
+                  (cache - {new Date(forecastData.meta.cached_at).toLocaleString('fr-FR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })})
+                </span>
+              )}
+              {forecastData.meta?.fromCache && !forecastData.meta?.cached_at && ' (cache)'}
               {forecastError && <span className="text-destructive ml-2">⚠️ {forecastError}</span>}
             </span>
           </div>

@@ -13,6 +13,8 @@ export interface TideData {
   coefficient: string;
   tides: Tide[];
   expires_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 /**
@@ -81,12 +83,8 @@ async function fetchAndCacheTides(spotId: string, date: string): Promise<TideDat
   }
   
   try {
-    // Fetch tide data from mareespeche.com
-    const response = await fetch(spot.shom_url);
-    const html = await response.text();
-    
-    // Extract tide data
-    const tideData = extractTideData(html);
+    // Extract tide data using API or HTML
+    const tideData = await extractTideData(spot.shom_url);
     
     if (!tideData) {
       return null;
@@ -136,34 +134,83 @@ async function fetchAndCacheTides(spotId: string, date: string): Promise<TideDat
 }
 
 /**
- * Extract tide data from HTML
+ * Extract tide data from HTML or API
  */
-function extractTideData(html: string): { coefficient: string; tides: Tide[] } | null {
-  const highTides: Array<{ time: string; height: string }> = [];
-  const lowTides: Array<{ time: string; height: string }> = [];
+async function extractTideData(url: string): Promise<{ coefficient: string; tides: Tide[] } | null> {
+  try {
+    // Fetch HTML from URL
+    const response = await fetch(url);
+    const html = await response.text();
+    
+    // Parse HTML directly (API doesn't work)
+    return extractTideDataFromHTML(html);
+  } catch (error) {
+    console.error('Error extracting tide data:', error);
+    return null;
+  }
+}
+
+/**
+ * Extract tide data from HTML (fallback)
+ */
+function extractTideDataFromHTML(urlOrHtml: string): { coefficient: string; tides: Tide[] } | null {
+  const html = urlOrHtml;
+  const allTides: Tide[] = [];
   
-  // Extract high tides
-  const highTidePattern = /marée haute[^\d]+(\d{1,2}h\d{2})[^\d]+suivante[^\d]+(\d{1,2}h\d{2})/i;
-  const highMatch = highTidePattern.exec(html);
+  // Try to find all tide times in the format "Xh:XX am/pm" with heights
+  // Pattern matches lines like: "12:17 am ▼ 0,3 m" or "6:24 am ▲ 4,6 m"
+  const tidePattern = /(\d{1,2}):(\d{2})\s*(?:am|pm)?\s*[▼▲]?\s*(\d+[.,]\d+)\s*m/gi;
+  let match;
   
-  if (highMatch) {
-    highTides.push({ time: highMatch[1], height: 'N/A' });
-    highTides.push({ time: highMatch[2], height: 'N/A' });
+  while ((match = tidePattern.exec(html)) !== null) {
+    const hour = match[1];
+    const minute = match[2];
+    const height = parseFloat(match[3].replace(',', '.'));
+    
+    // Determine type based on height (high tide > 2.5m, low tide < 2.5m)
+    const type = height > 2.5 ? 'high' : 'low';
+    
+    allTides.push({
+      time: `${hour}h${minute}`,
+      height: `${height} m`,
+      type
+    });
   }
   
-  // Extract low tides
-  const lowTidePattern = /marée basse[^\d]+(\d{1,2}h\d{2})[^\d]+suivante[^\d]+(\d{1,2}h\d{2})/i;
-  const lowMatch = lowTidePattern.exec(html);
-  
-  if (lowMatch) {
-    lowTides.push({ time: lowMatch[1], height: 'N/A' });
-    lowTides.push({ time: lowMatch[2], height: 'N/A' });
+  // If no tides found with the pattern above, try the old method
+  if (allTides.length === 0) {
+    const highTides: Array<{ time: string; height: string }> = [];
+    const lowTides: Array<{ time: string; height: string }> = [];
+    
+    // Extract high tides
+    const highTidePattern = /marée haute[^\d]+(\d{1,2}h\d{2})[^\d]+suivante[^\d]+(\d{1,2}h\d{2})/i;
+    const highMatch = highTidePattern.exec(html);
+    
+    if (highMatch) {
+      highTides.push({ time: highMatch[1], height: 'N/A' });
+      highTides.push({ time: highMatch[2], height: 'N/A' });
+    }
+    
+    // Extract low tides
+    const lowTidePattern = /marée basse[^\d]+(\d{1,2}h\d{2})[^\d]+suivante[^\d]+(\d{1,2}h\d{2})/i;
+    const lowMatch = lowTidePattern.exec(html);
+    
+    if (lowMatch) {
+      lowTides.push({ time: lowMatch[1], height: 'N/A' });
+      lowTides.push({ time: lowMatch[2], height: 'N/A' });
+    }
+    
+    allTides.push(
+      ...highTides.map(t => ({ ...t, type: 'high' as const })),
+      ...lowTides.map(t => ({ ...t, type: 'low' as const }))
+    );
   }
   
-  // Extract coefficient
+  // Extract coefficient - try "aujourd'hui" pattern first for today's coefficient
   const coeffTodayPattern = /aujourd'hui[^\d]*coefficient[^\d]*(\d{2,3})/i;
   let coeffMatch = coeffTodayPattern.exec(html);
   
+  // Fallback to any coefficient if today's not found
   if (!coeffMatch) {
     const coeffPattern = /coefficient[^\d]*(\d{2,3})/i;
     coeffMatch = coeffPattern.exec(html);
@@ -171,11 +218,8 @@ function extractTideData(html: string): { coefficient: string; tides: Tide[] } |
   
   const coefficient = coeffMatch ? coeffMatch[1] : 'N/A';
   
-  // Combine and sort tides
-  const allTides: Tide[] = [
-    ...highTides.map(t => ({ ...t, type: 'high' as const })),
-    ...lowTides.map(t => ({ ...t, type: 'low' as const }))
-  ].sort((a, b) => {
+  // Sort tides by time
+  allTides.sort((a, b) => {
     const timeA = a.time.replace('h', ':');
     const timeB = b.time.replace('h', ':');
     return timeA.localeCompare(timeB);

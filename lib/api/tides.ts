@@ -157,71 +157,13 @@ async function getFallbackTides(spotId?: string): Promise<TideData> {
         return { events, hourly }
       }
     } catch (error) {
-      console.warn('⚠️  Could not load mareespeche.com data, using simulated fallback')
+      console.warn('⚠️  Could not load mareespeche.com data')
     }
   }
   
-  // Last resort: simulated data
-  console.warn('⚠️  Using simulated tide data')
-  const now = new Date()
-  const events: TideEvent[] = []
-  const hourly: HourlyTide[] = []
-  
-  const baseHeight = 2.5
-  const amplitude = 2.0
-  const periodHours = 12.42
-  
-  for (let day = 0; day < 7; day++) {
-    for (let tide = 0; tide < 4; tide++) {
-      const date = new Date(now)
-      date.setDate(date.getDate() + day)
-      date.setHours(Math.floor(tide * periodHours / 2))
-      date.setMinutes(25 * (tide % 2))
-      
-      events.push({
-        time: date.toISOString(),
-        height: baseHeight + (tide % 2 === 0 ? amplitude : -amplitude),
-        type: tide % 2 === 0 ? 'high' : 'low',
-      })
-    }
-  }
-  
-  // Generate hourly data based on tide events (interpolation)
-  for (let hour = 0; hour < 168; hour++) {
-    const date = new Date(now)
-    date.setHours(date.getHours() + hour)
-    
-    // Find surrounding tide events
-    const currentTime = date.getTime()
-    let prevEvent = events[0]
-    let nextEvent = events[1]
-    
-    for (let i = 0; i < events.length - 1; i++) {
-      const eventTime = new Date(events[i].time).getTime()
-      const nextEventTime = new Date(events[i + 1].time).getTime()
-      
-      if (currentTime >= eventTime && currentTime <= nextEventTime) {
-        prevEvent = events[i]
-        nextEvent = events[i + 1]
-        break
-      }
-    }
-    
-    // Linear interpolation between tide events
-    const prevTime = new Date(prevEvent.time).getTime()
-    const nextTime = new Date(nextEvent.time).getTime()
-    const timeDiff = nextTime - prevTime
-    const timeProgress = (currentTime - prevTime) / timeDiff
-    
-    const height = prevEvent.height + (nextEvent.height - prevEvent.height) * timeProgress
-    
-    hourly.push({
-      time: date.toISOString(),
-      height: Math.max(0, height),
-    })
-  }
-  
-  return { events, hourly }
+  // No tide data available - return empty
+  console.warn('⚠️  No tide data available')
+  return { events: [], hourly: [] }
 }
 
 function generateHourlyFromEvents(events: TideEvent[]): HourlyTide[] {

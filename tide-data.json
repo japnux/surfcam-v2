@@ -1,0 +1,1668 @@
+[
+  {
+    "spotId": "d7086f10-ceee-4dfb-a021-9b17686a582a",
+    "spotName": "Anglet - Plage des Cavaliers",
+    "city": "Anglet",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/anglet",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h18",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h36",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h47",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h25",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:21.783Z"
+  },
+  {
+    "spotId": "e25a8c40-cbf6-4473-a0ab-53f9b9696070",
+    "spotName": "Anglet - Plage de la Barre",
+    "city": "Anglet",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/anglet",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h18",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h36",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h47",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h25",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:22.442Z"
+  },
+  {
+    "spotId": "a15fd733-cf50-4082-b8ad-fc83b5db1951",
+    "spotName": "Hossegor - La Centrale",
+    "city": "Hossegor",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/capbreton",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h20",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h38",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h49",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h27",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:23.094Z"
+  },
+  {
+    "spotId": "0e8e8cf1-e15e-49e9-a069-caca8013eb87",
+    "spotName": "Hossegor - Plage de la Nord",
+    "city": "Hossegor",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/capbreton",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h20",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h38",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h49",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h27",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:23.746Z"
+  },
+  {
+    "spotId": "c8a5784e-2c12-4a39-9121-a919254b8f84",
+    "spotName": "La - Hague Sciotot",
+    "city": "La Hague",
+    "tideUrl": "https://mareespeche.com/fr/normandie/goury",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "N/A",
+        "tides": []
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:24.359Z"
+  },
+  {
+    "spotId": "c4c6b4ea-48f4-4452-8b34-556b8adadaf0",
+    "spotName": "La - Hague Nacqueville",
+    "city": "La Hague",
+    "tideUrl": "https://mareespeche.com/fr/normandie/goury",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "N/A",
+        "tides": []
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:24.974Z"
+  },
+  {
+    "spotId": "813eada0-41f1-446a-97b1-3fe2f4f4e32d",
+    "spotName": "Lacanau - Plage de Lacanau Océan",
+    "city": "Lacanau",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/lacanau",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h51",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "13h09",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "19h18",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h56",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:25.637Z"
+  },
+  {
+    "spotId": "c622f724-1366-4521-a181-943c87197d9c",
+    "spotName": "Les - Sables d'Olonne Zone surf",
+    "city": "Les Sables-d'Olonne",
+    "tideUrl": "https://mareespeche.com/fr/pays-de-la-loire/saint-jean-de-monts",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h40",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h58",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h53",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h31",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:26.304Z"
+  },
+  {
+    "spotId": "fced14a4-9678-46af-b6c7-b8b26003c420",
+    "spotName": "Les - Sables d'Olonne Panoramique Vidéo",
+    "city": "Les Sables-d'Olonne",
+    "tideUrl": "https://mareespeche.com/fr/pays-de-la-loire/saint-jean-de-monts",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h40",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h58",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h53",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h31",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:26.959Z"
+  },
+  {
+    "spotId": "6c1b553b-4111-4047-b0a9-115571bc0261",
+    "spotName": "Moliets - Plage Nord",
+    "city": "Moliets",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/moliets-et-maa",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h24",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h42",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h52",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h30",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:27.621Z"
+  },
+  {
+    "spotId": "6daf4015-9260-4f70-bf00-eb9abb9cae0a",
+    "spotName": "Moliets - Plage Centrale",
+    "city": "Moliets",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/moliets-et-maa",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h24",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h42",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h52",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h30",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:28.281Z"
+  },
+  {
+    "spotId": "90558baa-f4c7-4e5f-bf62-e1d464880679",
+    "spotName": "Montalivet - Plage Centrale",
+    "city": "Montalivet",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/pointe-de-grave",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h45",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "13h03",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "19h27",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "7h05",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:28.950Z"
+  },
+  {
+    "spotId": "52886a89-4831-4bae-9df9-1b842a9f5b15",
+    "spotName": "Ondres - Plage Centrale",
+    "city": "Ondres",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/ondres",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h19",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h37",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h48",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h26",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:29.611Z"
+  },
+  {
+    "spotId": "c8331419-cec3-48cd-b6fc-64719a1177e9",
+    "spotName": "Pouldreuzic - La plage",
+    "city": "Pouldreuzic",
+    "tideUrl": "https://mareespeche.com/fr/bretagne/douarnenez",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "N/A",
+        "tides": []
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:30.238Z"
+  },
+  {
+    "spotId": "8a2e8789-853d-4ab6-9559-e3ae0f26568d",
+    "spotName": "Quiberon - - Penthièvre Plage de l'Isthme / Baie de Quiberon",
+    "city": "Quiberon",
+    "tideUrl": "https://mareespeche.com/fr/bretagne/vannes",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "N/A",
+        "tides": []
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:30.854Z"
+  },
+  {
+    "spotId": "018bdaf7-3c72-49e0-bbc4-d6eeb0ba440a",
+    "spotName": "Saint - Brévin Plage de l'océan",
+    "city": "Saint-Brevin-les-Pins",
+    "tideUrl": "https://mareespeche.com/fr/pays-de-la-loire/saint-brevin-les-pins",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h43",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "13h01",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h48",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h26",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:31.517Z"
+  },
+  {
+    "spotId": "32e56e8c-f144-42e8-8ba8-0adabf92463b",
+    "spotName": "Seignosse - Plage du Penon",
+    "city": "Seignosse",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/seignosse",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h21",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h39",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h50",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h28",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:32.182Z"
+  },
+  {
+    "spotId": "a8f7fbd9-b4c9-431b-83cb-e5a210f988ee",
+    "spotName": "Ciboure - Plage de la Bougie",
+    "city": "Ciboure",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/bidart",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h16",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h34",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h45",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h23",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:32.837Z"
+  },
+  {
+    "spotId": "f2398d0b-da68-45d2-a5c2-b25c75f5c459",
+    "spotName": "Seignosse - Plage des Bourdaines - Plage des Estagnots",
+    "city": "Seignosse",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/seignosse",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h21",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h39",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h50",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h28",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:33.491Z"
+  },
+  {
+    "spotId": "7a16f1f0-30c5-4d55-a4ff-5de507d34645",
+    "spotName": "Vieux-Boucau - Plage de Vieux Boucau",
+    "city": "Vieux-Boucau",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/vieux-boucau-les-bains",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h23",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h41",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h52",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h30",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:34.148Z"
+  },
+  {
+    "spotId": "a74c55ce-3501-4396-be3f-b1e830d940fc",
+    "spotName": "Anglet - Madrague, Océan, Dunes",
+    "city": "Anglet",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/anglet",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h18",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h36",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h47",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h25",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:34.808Z"
+  },
+  {
+    "spotId": "494068e2-3a2b-42be-8af4-c49c68d3461b",
+    "spotName": "Biarritz - Vue du Casino et de l'Hotel du Palais",
+    "city": "Biarritz",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/biarritz",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h17",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h35",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h46",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h24",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:35.470Z"
+  },
+  {
+    "spotId": "fe80a853-6a04-4156-85df-e5cc8c0a3600",
+    "spotName": "Biarritz - La Côte des Basques",
+    "city": "Biarritz",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/biarritz",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h17",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h35",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h46",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h24",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:36.119Z"
+  },
+  {
+    "spotId": "2d039767-bbed-4a9d-9e0b-c0b4c1994fb1",
+    "spotName": "Biarritz - La Grande Plage",
+    "city": "Biarritz",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/biarritz",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h17",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h35",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h46",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h24",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:36.786Z"
+  },
+  {
+    "spotId": "31e5418d-4c11-4e24-a96b-30646a875f8d",
+    "spotName": "Bidart - Parlementia",
+    "city": "Bidart",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/bidart",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h16",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h34",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h45",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h23",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:37.439Z"
+  },
+  {
+    "spotId": "8419138d-7837-4c65-9626-050da5c57d51",
+    "spotName": "Hendaye - Plage d'Ondarraitz",
+    "city": "Hendaye",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/bidart",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h16",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h34",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h45",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h23",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:38.097Z"
+  },
+  {
+    "spotId": "86f2b065-f08e-41cb-8be6-c26b44450e26",
+    "spotName": "La - Teste de Buch Plage Nord",
+    "city": "La Teste-de-Buch",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/la-teste-de-buch",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "1h09",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "13h27",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "19h44",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "7h22",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:38.759Z"
+  },
+  {
+    "spotId": "08583b4a-80f8-4b29-a004-9c22c9e5c1bf",
+    "spotName": "La - Teste de Buch Plage Sud",
+    "city": "La Teste-de-Buch",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/la-teste-de-buch",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "1h09",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "13h27",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "19h44",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "7h22",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:39.413Z"
+  },
+  {
+    "spotId": "a7db43e4-6162-4f79-a1cb-30dbec05c516",
+    "spotName": "Anglet - Plage du VVF",
+    "city": "Anglet",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/anglet",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h18",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h36",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h47",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h25",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:40.065Z"
+  },
+  {
+    "spotId": "172d2626-26c8-4358-8b07-e56654c7a223",
+    "spotName": "Anglet - Plage du Club",
+    "city": "Anglet",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/anglet",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h18",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h36",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h47",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h25",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:40.727Z"
+  },
+  {
+    "spotId": "3d2a7da4-a637-4dba-8093-9c874fd97ad8",
+    "spotName": "Anglet - Plage de Marinella & Sables d'Or",
+    "city": "Anglet",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/anglet",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h18",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h36",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h47",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h25",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:41.381Z"
+  },
+  {
+    "spotId": "374f88bf-591f-4fbb-9cd2-b97b54c7cf90",
+    "spotName": "Anglet - Plage des Sables d'or",
+    "city": "Anglet",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/anglet",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h18",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h36",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h47",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h25",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:42.040Z"
+  },
+  {
+    "spotId": "2dcb2938-a75f-4e87-badc-dbe250955080",
+    "spotName": "Biarritz - La Grande Plage Vue du Phare et de la Roche plate",
+    "city": "Biarritz",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/biarritz",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h17",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h35",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h46",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h24",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:42.694Z"
+  },
+  {
+    "spotId": "cc032c2b-9adc-4af7-8110-868c9c9cc745",
+    "spotName": "Bidart - Plage du Centre",
+    "city": "Bidart",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/bidart",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h16",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h34",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h45",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h23",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:43.347Z"
+  },
+  {
+    "spotId": "f3b6c95f-4784-4037-915d-14d4ef2a008c",
+    "spotName": "Biscarrosse - Plage de la Centrale",
+    "city": "Biscarrosse",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/biscarrosse",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h13",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h31",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h45",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h23",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:44.012Z"
+  },
+  {
+    "spotId": "e16bc01d-9e5f-4ece-8688-cf36455bf034",
+    "spotName": "Capbreton - Plage du Prévent",
+    "city": "Capbreton",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/capbreton",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h20",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h38",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h49",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h27",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:44.682Z"
+  },
+  {
+    "spotId": "92672a37-6984-43a2-84cb-460612b17c15",
+    "spotName": "Contis - Plage de Contis",
+    "city": "Contis",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/mimizan",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h32",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h50",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h57",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h35",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:45.341Z"
+  },
+  {
+    "spotId": "fd7ddb0d-5456-4997-a21c-83179e30ce2c",
+    "spotName": "Hendaye - Plage du Casino et des Jumeaux",
+    "city": "Hendaye",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/bidart",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h16",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h34",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h45",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h23",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:45.992Z"
+  },
+  {
+    "spotId": "577b318f-55f3-4b47-96b0-6188018f6349",
+    "spotName": "Mimizan - Plage Nord",
+    "city": "Mimizan",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/mimizan",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h32",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h50",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h57",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h35",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:46.683Z"
+  },
+  {
+    "spotId": "52b10121-3bec-4b27-8e1f-b1eb8eefd47d",
+    "spotName": "Mimizan - Plage Centrale",
+    "city": "Mimizan",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/mimizan",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h32",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h50",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h57",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h35",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:47.338Z"
+  },
+  {
+    "spotId": "30268e61-58c2-41ed-9a63-517a48ca77de",
+    "spotName": "Mimizan - Plage Sud",
+    "city": "Mimizan",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/mimizan",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h32",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h50",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h57",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h35",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:47.991Z"
+  },
+  {
+    "spotId": "52fc2260-2494-4e8c-8e4e-c503ea308d6b",
+    "spotName": "Moliets - Plage Sud",
+    "city": "Moliets",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/moliets-et-maa",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h24",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h42",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h52",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h30",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:48.647Z"
+  },
+  {
+    "spotId": "051eafcd-a88f-4b68-a385-834f7b3fb3d1",
+    "spotName": "Bénodet - La Grande Plage",
+    "city": "Bénodet",
+    "tideUrl": "https://mareespeche.com/fr/bretagne/concarneau",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "N/A",
+        "tides": []
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:49.277Z"
+  },
+  {
+    "spotId": "cb57985e-80fd-47a6-941e-1d4ad8cf36ac",
+    "spotName": "Capbreton - Plage du Santosha / de La Piste",
+    "city": "Capbreton",
+    "tideUrl": "https://mareespeche.com/fr/aquitaine/capbreton",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h20",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h38",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h49",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h27",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:49.931Z"
+  },
+  {
+    "spotId": "03ee9f1d-7f0c-44c2-811c-f3cb8c79f634",
+    "spotName": "Crozon - Plage du Morgat",
+    "city": "Crozon",
+    "tideUrl": "https://mareespeche.com/fr/bretagne/brest",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "N/A",
+        "tides": []
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:50.555Z"
+  },
+  {
+    "spotId": "da52a2fb-63ff-4b52-976d-54494dc86677",
+    "spotName": "Les - Sables d'Olonne Spot de la Baie",
+    "city": "Les Sables-d'Olonne",
+    "tideUrl": "https://mareespeche.com/fr/pays-de-la-loire/saint-jean-de-monts",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h40",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h58",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h53",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h31",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:51.211Z"
+  },
+  {
+    "spotId": "2a806ee7-7bb6-41bb-bbba-bfadb65c6460",
+    "spotName": "Les - Sables d'Olonne Plage de Tanchet",
+    "city": "Les Sables-d'Olonne",
+    "tideUrl": "https://mareespeche.com/fr/pays-de-la-loire/saint-jean-de-monts",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h40",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h58",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h53",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h31",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:51.864Z"
+  },
+  {
+    "spotId": "2ac038f8-e27b-4e5d-a01e-9c54c4ab0aa4",
+    "spotName": "Les - Sables d'Olonne Baie des Sables",
+    "city": "Les Sables-d'Olonne",
+    "tideUrl": "https://mareespeche.com/fr/pays-de-la-loire/saint-jean-de-monts",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h40",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h58",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "18h53",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h31",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:52.530Z"
+  },
+  {
+    "spotId": "57d219f5-e1dd-4b57-bd6e-d7609c58eea6",
+    "spotName": "Pouldreuzic - Plage de Penhors",
+    "city": "Pouldreuzic",
+    "tideUrl": "https://mareespeche.com/fr/bretagne/douarnenez",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "N/A",
+        "tides": []
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:53.161Z"
+  },
+  {
+    "spotId": "68a93635-186f-43a8-abd5-5abcaebd1270",
+    "spotName": "Saint - Philibert Base nautique",
+    "city": "Saint-Philibert",
+    "tideUrl": "https://mareespeche.com/fr/bretagne/vannes",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "N/A",
+        "tides": []
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:53.786Z"
+  },
+  {
+    "spotId": "5b14251a-48b4-44e3-b511-6c947a78a158",
+    "spotName": "Le - Havre Plage du Havre",
+    "city": "Le Havre",
+    "tideUrl": "https://mareespeche.com/fr/normandie/honfleur",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "N/A",
+        "tides": []
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:54.401Z"
+  },
+  {
+    "spotId": "ce757c31-252c-4f99-9cbb-3fd9131c4bde",
+    "spotName": "Royan - Grande Conche",
+    "city": "Royan",
+    "tideUrl": "https://mareespeche.com/fr/poitou-charentes/royan-gironde-river",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h39",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h57",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "19h15",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h53",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:55.105Z"
+  },
+  {
+    "spotId": "4fd2bde5-c6e7-4f6c-bf0c-df77adb33412",
+    "spotName": "Royan - Pontaillac",
+    "city": "Royan",
+    "tideUrl": "https://mareespeche.com/fr/poitou-charentes/royan-gironde-river",
+    "days": [
+      {
+        "date": "2025-10-09",
+        "coefficient": "110",
+        "tides": [
+          {
+            "time": "0h39",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "12h57",
+            "height": "N/A",
+            "type": "low"
+          },
+          {
+            "time": "19h15",
+            "height": "N/A",
+            "type": "high"
+          },
+          {
+            "time": "6h53",
+            "height": "N/A",
+            "type": "high"
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2025-10-09T11:55:55.751Z"
+  }
+]

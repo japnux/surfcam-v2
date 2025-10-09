@@ -1,3 +1,8 @@
 {
-  "crons": []
+  "crons": [
+    {
+      "path": "/api/cron/fetch-tides",
+      "schedule": "0 1 * * *"
+    }
+  ]
 }

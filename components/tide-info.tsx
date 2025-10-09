@@ -21,21 +21,21 @@ export async function TideInfo({ spotId, tides, sunData, tideCoefficient }: Tide
   
   // Get next 2 tide events
   const nextTides = cachedTides?.tides 
-    ? cachedTides.tides.filter(t => {
-        const [hours, minutes] = t.time.split('h').map(Number)
-        const tideTime = new Date()
-        tideTime.setHours(hours, minutes, 0, 0)
-        return tideTime > now
-      }).slice(0, 2).map(t => ({
-        time: (() => {
+    ? cachedTides.tides
+        .map(t => {
           const [hours, minutes] = t.time.split('h').map(Number)
-          const date = new Date()
-          date.setHours(hours, minutes, 0, 0)
-          return date.toISOString()
-        })(),
-        type: t.type,
-        height: 0 // Not used in display
-      }))
+          const tideTime = new Date()
+          tideTime.setHours(hours, minutes, 0, 0)
+          return {
+            time: tideTime.toISOString(),
+            type: t.type,
+            height: 0,
+            sortTime: tideTime.getTime()
+          }
+        })
+        .sort((a, b) => a.sortTime - b.sortTime) // Sort by time
+        .filter(t => new Date(t.time) > now) // Filter future tides
+        .slice(0, 2) // Take first 2
     : tides.events.filter(e => new Date(e.time) > now).slice(0, 2)
   
   // Use coefficient from cached data if available
@@ -64,17 +64,41 @@ export async function TideInfo({ spotId, tides, sunData, tideCoefficient }: Tide
     return null
   })()
   
-  if (nextTides.length === 0 && !nextSunEvent) return null
+  // Show component even if no tides, to display N/A
+  const hasTides = nextTides.length > 0
+  const hasData = hasTides || nextSunEvent
   
   // Calculate tide coefficient from amplitude (French system: 20-120)
 
   return (
     <div className="bg-card border border-border rounded-lg p-4">
-      <h3 className="text-sm font-medium text-muted-foreground mb-3">Marées</h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-medium text-muted-foreground">Marées/Soleil</h3>
+        {cachedTides && (
+          <span className="text-xs text-muted-foreground">
+            Source: Mareespeche.com
+            {cachedTides.updated_at && (
+              <span className="ml-1">
+                ({new Date(cachedTides.updated_at).toLocaleString('fr-FR', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })})
+                {new Date(cachedTides.expires_at) < new Date() && (
+                  <span className="text-orange-500 ml-1" title="Les données ont expiré et devraient être mises à jour">
+                    ⚠️ Expiré
+                  </span>
+                )}
+              </span>
+            )}
+          </span>
+        )}
+      </div>
       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-y-4 items-center">
         {/* Tide 1 */}
-        {nextTides[0] && (
+        {hasTides && nextTides[0] ? (
           <div className="flex items-center gap-2">
             {nextTides[0].type === 'high' ? (
               <ArrowUp className="h-5 w-5 text-blue-500" />
@@ -90,6 +114,10 @@ export async function TideInfo({ spotId, tides, sunData, tideCoefficient }: Tide
               </div>
             </div>
           </div>
+        ) : !hasTides && (
+          <div className="flex items-center gap-2">
+            <div className="text-muted-foreground">N/A</div>
+          </div>
         )}
         
         {/* Tide Coefficient */}
@@ -103,7 +131,7 @@ export async function TideInfo({ spotId, tides, sunData, tideCoefficient }: Tide
         )}
 
         {/* Tide 2 */}
-        {nextTides[1] && (
+        {hasTides && nextTides[1] && (
           <div className="flex items-center gap-2">
             {nextTides[1].type === 'high' ? (
               <ArrowUp className="h-5 w-5 text-blue-500" />
