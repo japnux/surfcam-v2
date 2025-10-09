@@ -24,12 +24,13 @@ interface ForecastTableProps {
 }
 
 export function ForecastTable({ hourly, tideHourly, tideEvents, daily, hoursToShow = 48 }: ForecastTableProps) {
-  // Obtenir l'heure courante arrondie à l'heure inférieure (en utilisant le timestamp pour éviter les problèmes de fuseau horaire)
+  // Obtenir l'heure courante en UTC (comme les données de l'API)
   const now = new Date()
-  now.setMinutes(0, 0, 0) // Arrondir à l'heure inférieure
-  const nowTimestamp = now.getTime()
+  // Les données de l'API sont en UTC, donc on compare en UTC
+  const nowTimestamp = Date.now()
   
   // Filtrer les prévisions pour ne garder que celles >= à l'heure courante
+  // Les timestamps sont déjà en UTC dans hour.time
   const futureForecasts = hourly.filter(hour => new Date(hour.time).getTime() >= nowTimestamp)
   const displayData = futureForecasts.slice(0, hoursToShow)
 

@@ -24,6 +24,7 @@ export async function TideInfo({ spotId, tides, sunData, tideCoefficient }: Tide
     ? cachedTides.tides
         .map(t => {
           const [hours, minutes] = t.time.split('h').map(Number)
+          // Créer la date pour aujourd'hui en heure locale (France)
           const tideTime = new Date()
           tideTime.setHours(hours, minutes, 0, 0)
           return {
@@ -34,9 +35,9 @@ export async function TideInfo({ spotId, tides, sunData, tideCoefficient }: Tide
           }
         })
         .sort((a, b) => a.sortTime - b.sortTime) // Sort by time
-        .filter(t => new Date(t.time) > now) // Filter future tides
+        .filter(t => new Date(t.time).getTime() > now.getTime()) // Filter future tides
         .slice(0, 2) // Take first 2
-    : tides.events.filter(e => new Date(e.time) > now).slice(0, 2)
+    : tides.events.filter(e => new Date(e.time).getTime() > now.getTime()).slice(0, 2)
   
   // Use coefficient from cached data if available
   const coefficient = cachedTides?.coefficient ? parseInt(cachedTides.coefficient) : tideCoefficient
