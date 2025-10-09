@@ -1,9 +1,9 @@
 import { createClient, createServiceClient } from '@/lib/supabase/server';
-import { Database } from '@/lib/supabase/types';
+import { Tables, TablesInsert, TablesUpdate } from '@/lib/supabase/types';
 
-export type Spot = Database['public']['Tables']['spots']['Row'];
-export type SpotInsert = Database['public']['Tables']['spots']['Insert'];
-export type SpotUpdate = Database['public']['Tables']['spots']['Update'];
+export type Spot = Tables<'spots'>;
+export type SpotInsert = TablesInsert<'spots'>;
+export type SpotUpdate = TablesUpdate<'spots'>;
 
 export async function getActiveSpots(limit?: number) {
   const supabase = await createServiceClient();
@@ -161,7 +161,7 @@ export async function getCities() {
   return cities;
 }
 
-export async function getSpotsByCity(city: string) {
+export async function getSpotsByCity(city: string): Promise<Spot[]> {
   const supabase = await createServiceClient();
   
   const { data, error } = await supabase
@@ -172,7 +172,7 @@ export async function getSpotsByCity(city: string) {
     .order('name');
 
   if (error) throw error;
-  return data;
+  return data ?? [];
 }
 
 export async function getSpotsByIds(ids: string[]) {

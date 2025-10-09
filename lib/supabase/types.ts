@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       spots: {
@@ -29,9 +29,12 @@ export interface Database {
           hazards: string | null
           license_credit: string | null
           shom_url: string | null
-          active: boolean
-          created_at: string
-          updated_at: string
+          is_active: boolean
+          has_daily_forecast: boolean
+          timezone: string
+          shom_station: string | null
+          created_at: string | null
+          updated_at: string | null
         }
         Insert: {
           id?: string
@@ -52,9 +55,12 @@ export interface Database {
           hazards?: string | null
           license_credit?: string | null
           shom_url?: string | null
-          active?: boolean
-          created_at?: string
-          updated_at?: string
+          is_active?: boolean
+          has_daily_forecast?: boolean
+          timezone?: string
+          shom_station?: string | null
+          created_at?: string | null
+          updated_at?: string | null
         }
         Update: {
           id?: string
@@ -75,9 +81,38 @@ export interface Database {
           hazards?: string | null
           license_credit?: string | null
           shom_url?: string | null
-          active?: boolean
-          created_at?: string
-          updated_at?: string
+          is_active?: boolean
+          has_daily_forecast?: boolean
+          timezone?: string
+          shom_station?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+      }
+      profiles: {
+        Row: {
+          id: string
+          email: string
+          display_name: string | null
+          locale: string
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id: string
+          email: string
+          display_name?: string | null
+          locale?: string
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          email?: string
+          display_name?: string | null
+          locale?: string
+          created_at?: string | null
+          updated_at?: string | null
         }
       }
       favorites: {
@@ -144,3 +179,8 @@ export interface Database {
     }
   }
 }
+
+// Helper types for easier access
+export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
+export type TablesInsert<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert']
+export type TablesUpdate<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update']
