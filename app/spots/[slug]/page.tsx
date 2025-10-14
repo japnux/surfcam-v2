@@ -33,7 +33,6 @@ const ForecastTable = dynamic(() => import('@/components/forecast-table').then(m
   ),
   ssr: false // Don't render on server for faster initial load
 })
-import { getTidesForSpot } from '@/lib/data/tides'
 import { FavoriteButton } from '@/components/favorite-button'
 import { ShareButton } from '@/components/share-button'
 import { config } from '@/lib/config'

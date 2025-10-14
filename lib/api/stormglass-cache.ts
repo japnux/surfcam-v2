@@ -1,5 +1,6 @@
 import { createServiceClient } from '@/lib/supabase/server'
-import { getStormglassForecast, getStormglassTides, transformStormglassData } from './stormglass'
+import { getStormglassForecast, transformStormglassData } from './stormglass'
+import { logStormglassCall } from './stormglass-logger'
 
 const DAILY_LIMIT = 10
 const CACHE_VALIDITY_HOURS = 24
@@ -99,8 +100,7 @@ async function getCachedForecast(spotId: string): Promise<CachedForecast | null>
  */
 async function saveForecastToCache(
   spotId: string,
-  forecast: any,
-  tides: any
+  forecast: any
 ): Promise<void> {
   const supabase = await createServiceClient()
   
@@ -114,10 +114,9 @@ async function saveForecastToCache(
 
   const payload = {
     forecast: transformStormglassData(forecast),
-    tides: tides?.data || [],
+    tides: [], // Tides are now fetched from Mareepeche, not Stormglass
     meta: {
       ...forecast.meta,
-      station: tides?.meta?.station,
       cached_at: now.toISOString(),
     },
   }
@@ -169,64 +168,74 @@ export async function getStormglassForecastCached(
     const callCount = await getTodayCallCount()
     
     if (callCount >= DAILY_LIMIT) {
-      console.warn(`⚠️ Stormglass daily limit reached (${callCount}/${DAILY_LIMIT})`)
+      console.warn(`⚠️ Stormglass daily limit reached (${callCount}/${DAILY_LIMIT}), falling back to Open-Meteo`)
       
-      // Return cached data even if expired, better than nothing
-      if (cached) {
-        console.log(`📦 Returning expired cache for spot ${spotId}`)
-        return {
-          data: cached.payload,
-          fromCache: true,
-          callsRemaining: 0,
-        }
-      }
+      // Log quota exceeded
+      await logStormglassCall({
+        spotId,
+        endpoint: 'forecast',
+        status: 'quota_exceeded',
+        errorMessage: `Daily limit reached (${callCount}/${DAILY_LIMIT})`,
+        latitude: lat,
+        longitude: lng,
+      })
       
-      // No cache available, return null to trigger fallback
+      // Return null to trigger Open-Meteo fallback (better than expired cache)
       return null
     }
 
-    // 3. Fetch fresh data from Stormglass
+    // 3. Fetch fresh data from Stormglass (forecast only, tides come from Mareepeche)
     console.log(`🌊 Fetching fresh Stormglass data for spot ${spotId} (${callCount + 1}/${DAILY_LIMIT})`)
     
-    const [forecast, tides] = await Promise.all([
-      getStormglassForecast(lat, lng),
-      getStormglassTides(lat, lng),
-    ])
+    const forecast = await getStormglassForecast(lat, lng)
 
     if (!forecast) {
-      console.error('Failed to fetch Stormglass forecast')
+      console.error('Failed to fetch Stormglass forecast, falling back to Open-Meteo')
       
-      // Return cached data as fallback
-      if (cached) {
-        return {
-          data: cached.payload,
-          fromCache: true,
-          callsRemaining: DAILY_LIMIT - callCount,
-        }
-      }
+      // Log failed call
+      await logStormglassCall({
+        spotId,
+        endpoint: 'forecast',
+        status: 'error',
+        errorMessage: 'Failed to fetch forecast',
+        latitude: lat,
+        longitude: lng,
+      })
       
       return null
     }
 
-    // 4. Increment call counter (2 calls: forecast + tides)
+    // 4. Increment call counter (1 call: forecast only, tides from Mareepeche)
     await incrementCallCount() // Forecast call
-    await incrementCallCount() // Tides call
     
-    const newCallCount = callCount + 2
+    const newCallCount = callCount + 1
 
     // 5. Save to cache
-    await saveForecastToCache(spotId, forecast, tides)
+    await saveForecastToCache(spotId, forecast)
 
-    // 6. Return fresh data
+    // 6. Log successful call
     const transformed = transformStormglassData(forecast)
-    
+    await logStormglassCall({
+      spotId,
+      endpoint: 'forecast',
+      status: 'success',
+      responseSummary: {
+        hoursCount: transformed.length,
+        dataStart: transformed[0]?.time,
+        dataEnd: transformed[transformed.length - 1]?.time,
+        source: 'stormglass',
+      },
+      latitude: lat,
+      longitude: lng,
+    })
+
+    // 7. Return fresh data
     return {
       data: {
         forecast: transformed,
-        tides: tides?.data || [],
+        tides: [], // Tides are fetched separately from Mareepeche
         meta: {
           ...forecast.meta,
-          station: tides?.meta?.station,
           cached_at: new Date().toISOString(),
         },
       },
@@ -235,17 +244,7 @@ export async function getStormglassForecastCached(
     }
   } catch (error) {
     console.error('Error in getStormglassForecastCached:', error)
-    
-    // Try to return cached data as last resort
-    const cached = await getCachedForecast(spotId)
-    if (cached) {
-      return {
-        data: cached.payload,
-        fromCache: true,
-        callsRemaining: 0,
-      }
-    }
-    
+    console.log('Falling back to Open-Meteo due to error')
     return null
   }
 }

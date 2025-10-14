@@ -83,6 +83,20 @@ npx tsx scripts/clean-expired-tides.ts
 
 ---
 
+#### `clean-old-forecast-cache.ts`
+Supprime les caches de prévisions Stormglass de plus de 7 jours.
+
+```bash
+npx tsx scripts/clean-old-forecast-cache.ts
+```
+
+**Utilisation** :
+- Nettoyer les vieux caches Stormglass
+- Libérer de l'espace DB
+- Maintenance préventive
+
+---
+
 #### `delete-all-tides.ts`
 Supprime **TOUTES** les données de marées.
 
