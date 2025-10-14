@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export const metadata: Metadata = {
   title: 'Logs Stormglass - Administration',
-  description: 'Historique des appels à l\'API Stormglass',
+  description: 'Historique des appels à l&apos;API Stormglass',
   robots: {
     index: false,
     follow: false,
@@ -44,7 +44,7 @@ export default async function StormglassLogsPage() {
             <h1 className="text-4xl font-bold">Logs Stormglass</h1>
           </div>
           <p className="text-muted-foreground">
-            Historique des appels à l'API Stormglass
+            Historique des appels à l&apos;API Stormglass
           </p>
         </div>
       </div>
@@ -54,7 +54,7 @@ export default async function StormglassLogsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total aujourd'hui
+              Total aujourd&apos;hui
             </CardTitle>
           </CardHeader>
           <CardContent>
