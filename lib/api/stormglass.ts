@@ -111,6 +111,9 @@ export async function getStormglassForecast(
 
         if (response.status === 402) {
           console.warn(`⚠️  API key ${i + 1} quota exceeded (402), trying next key...`)
+          if (i === STORMGLASS_API_KEYS.length - 1) {
+            throw new Error('HTTP 402: All API keys quota exceeded')
+          }
           break // Try next API key
         }
         
@@ -120,7 +123,8 @@ export async function getStormglassForecast(
         }
         
         if (!response.ok) {
-          throw new Error(`Stormglass API error: ${response.status} ${response.statusText}`)
+          const errorText = await response.text().catch(() => response.statusText)
+          throw new Error(`HTTP ${response.status}: ${errorText}`)
         }
 
         const data = await response.json()

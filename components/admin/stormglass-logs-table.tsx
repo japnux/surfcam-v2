@@ -92,6 +92,54 @@ function formatResponseSummary(summary: any): string {
   return parts.length > 0 ? parts.join(' • ') : '-'
 }
 
+function formatErrorMessage(errorMessage: string | null): string {
+  if (!errorMessage) return 'Erreur inconnue'
+  
+  // HTTP 402: Quota exceeded
+  if (errorMessage.includes('402') || errorMessage.toLowerCase().includes('quota')) {
+    return '🚫 Quota API dépassé'
+  }
+  
+  // HTTP 401: Authentication error
+  if (errorMessage.includes('401') || errorMessage.toLowerCase().includes('unauthorized')) {
+    return '🔑 Erreur d\'authentification'
+  }
+  
+  // HTTP 422: Invalid parameters
+  if (errorMessage.includes('422') || errorMessage.toLowerCase().includes('unprocessable')) {
+    return '⚠️ Paramètres invalides'
+  }
+  
+  // HTTP 429: Rate limit
+  if (errorMessage.includes('429') || errorMessage.toLowerCase().includes('rate limit')) {
+    return '⏱️ Limite de requêtes atteinte'
+  }
+  
+  // HTTP 500+: Server error
+  if (errorMessage.match(/HTTP 5\d{2}/)) {
+    return '🔧 Erreur serveur Stormglass'
+  }
+  
+  // Network/timeout errors
+  if (errorMessage.toLowerCase().includes('timeout') || errorMessage.toLowerCase().includes('network')) {
+    return '📡 Erreur réseau / timeout'
+  }
+  
+  // No data returned
+  if (errorMessage.includes('no data') || errorMessage.includes('returned no data')) {
+    return '📭 API n\'a retourné aucune donnée'
+  }
+  
+  // Generic HTTP error with code
+  const httpMatch = errorMessage.match(/HTTP (\d{3})/)
+  if (httpMatch) {
+    return `❌ Erreur HTTP ${httpMatch[1]}`
+  }
+  
+  // Return original message if no pattern matches (truncate if too long)
+  return errorMessage.length > 50 ? errorMessage.substring(0, 47) + '...' : errorMessage
+}
+
 export function StormglassLogsTable({ logs }: StormglassLogsTableProps) {
   if (logs.length === 0) {
     return (
@@ -142,7 +190,12 @@ export function StormglassLogsTable({ logs }: StormglassLogsTableProps) {
               </TableCell>
               <TableCell className="text-sm">
                 {log.error_message ? (
-                  <span className="text-red-600">{log.error_message}</span>
+                  <span 
+                    className="text-red-600 font-medium cursor-help" 
+                    title={log.error_message}
+                  >
+                    {formatErrorMessage(log.error_message)}
+                  </span>
                 ) : (
                   <span className="text-muted-foreground">
                     {formatResponseSummary(log.response_summary)}

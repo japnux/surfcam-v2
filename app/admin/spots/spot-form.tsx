@@ -31,7 +31,10 @@ export function SpotForm({ spot }: SpotFormProps) {
     cam_url: spot?.cam_url || '',
     cam_type: spot?.cam_type || 'hls',
     license_credit: spot?.license_credit || '',
+    shom_url: spot?.shom_url || '',
+    shom_station: spot?.shom_station || '',
     is_active: spot?.is_active ?? true,
+    has_daily_forecast: spot?.has_daily_forecast ?? false,
   })
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
@@ -90,8 +93,11 @@ export function SpotForm({ spot }: SpotFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {/* Informations générales */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2">Informations générales</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="name">Nom *</Label>
           <Input
@@ -151,7 +157,13 @@ export function SpotForm({ spot }: SpotFormProps) {
             required
           />
         </div>
+        </div>
+      </div>
 
+      {/* Localisation */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2">Localisation</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="latitude">Latitude *</Label>
           <Input
@@ -175,7 +187,13 @@ export function SpotForm({ spot }: SpotFormProps) {
             required
           />
         </div>
+        </div>
+      </div>
 
+      {/* Caractéristiques du spot */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2">Caractéristiques du spot</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="break_type">Type de vague</Label>
           <Input
@@ -235,9 +253,13 @@ export function SpotForm({ spot }: SpotFormProps) {
             placeholder="Est, Nord-Est..."
           />
         </div>
+        </div>
       </div>
 
-      <div className="space-y-2">
+      {/* Webcam */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2">Webcam</h2>
+        <div className="space-y-2">
         <Label htmlFor="cam_url">URL de la webcam *</Label>
         <Input
           id="cam_url"
@@ -259,25 +281,74 @@ export function SpotForm({ spot }: SpotFormProps) {
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="license_credit">Crédit / License</Label>
-        <Input
-          id="license_credit"
-          value={formData.license_credit}
-          onChange={(e) => setFormData({ ...formData, license_credit: e.target.value })}
-          placeholder="Source de la webcam..."
-        />
+        <div className="space-y-2">
+          <Label htmlFor="license_credit">Crédit / License</Label>
+          <Input
+            id="license_credit"
+            value={formData.license_credit}
+            onChange={(e) => setFormData({ ...formData, license_credit: e.target.value })}
+            placeholder="Source de la webcam..."
+          />
+        </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          id="is_active"
-          checked={formData.is_active}
-          onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-          className="rounded"
+      {/* Marées */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2">Données de marées</h2>
+        <div className="space-y-2">
+        <Label htmlFor="shom_url">URL SHOM (Marées)</Label>
+        <Input
+          id="shom_url"
+          value={formData.shom_url}
+          onChange={(e) => setFormData({ ...formData, shom_url: e.target.value })}
+          placeholder="https://mareespeche.com/..."
         />
-        <Label htmlFor="is_active" className="cursor-pointer">Actif</Label>
+        <p className="text-xs text-muted-foreground">
+          URL de la page mareespeche.com pour récupérer les horaires de marées
+        </p>
+      </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="shom_station">Station SHOM</Label>
+          <Input
+            id="shom_station"
+            value={formData.shom_station}
+            onChange={(e) => setFormData({ ...formData, shom_station: e.target.value })}
+            placeholder="Nom de la station de référence"
+          />
+        </div>
+      </div>
+
+      {/* Options */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2">Options</h2>
+        
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="is_active"
+            checked={formData.is_active}
+            onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+            className="rounded"
+          />
+          <Label htmlFor="is_active" className="cursor-pointer">Spot actif</Label>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="has_daily_forecast"
+            checked={formData.has_daily_forecast}
+            onChange={(e) => setFormData({ ...formData, has_daily_forecast: e.target.checked })}
+            className="rounded"
+          />
+          <Label htmlFor="has_daily_forecast" className="cursor-pointer">
+            Prévisions quotidiennes (Stormglass)
+          </Label>
+        </div>
+        <p className="text-xs text-muted-foreground ml-6">
+          Active les prévisions détaillées via Stormglass API (limité à 10 spots/jour)
+        </p>
       </div>
 
       <div className="flex gap-4">

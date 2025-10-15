@@ -51,6 +51,7 @@ function formatTimestamp(timestamp: string | null): string {
 export function SpotsTable({ spots }: SpotsTableProps) {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
   const [sourceFilter, setSourceFilter] = useState<'all' | 'stormglass' | 'open-meteo'>('all')
+  const [tideFilter, setTideFilter] = useState<'all' | 'with-source' | 'no-source'>('all')
 
   const filteredSpots = spots.filter((spot) => {
     // Filter by status
@@ -62,64 +63,116 @@ export function SpotsTable({ spots }: SpotsTableProps) {
       if (spot.forecast_source !== sourceFilter) return false
     }
 
+    // Filter by tide source
+    if (tideFilter === 'with-source' && !spot.tide_source) return false
+    if (tideFilter === 'no-source' && spot.tide_source) return false
+
     return true
   })
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <span className="text-sm text-muted-foreground">
-          {filteredSpots.length} spot{filteredSpots.length > 1 ? 's' : ''}
-        </span>
-        <div className="flex items-center gap-2">
+      {/* Filters Section - Responsive */}
+      <div className="space-y-4 mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <span className="text-sm text-muted-foreground">
+            {filteredSpots.length} spot{filteredSpots.length > 1 ? 's' : ''}
+          </span>
+        </div>
+
+        {/* Filters Grid - Responsive */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
           {/* Status Filter */}
-          <div className="flex items-center gap-2 border rounded-lg p-1">
-            <Button
-              variant={statusFilter === 'all' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setStatusFilter('all')}
-            >
-              Tous
-            </Button>
-            <Button
-              variant={statusFilter === 'active' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setStatusFilter('active')}
-            >
-              Actifs
-            </Button>
-            <Button
-              variant={statusFilter === 'inactive' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setStatusFilter('inactive')}
-            >
-              Inactifs
-            </Button>
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground">Statut</label>
+            <div className="flex items-center gap-1 border rounded-lg p-1">
+              <Button
+                variant={statusFilter === 'all' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setStatusFilter('all')}
+                className="flex-1"
+              >
+                Tous
+              </Button>
+              <Button
+                variant={statusFilter === 'active' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setStatusFilter('active')}
+                className="flex-1"
+              >
+                Actifs
+              </Button>
+              <Button
+                variant={statusFilter === 'inactive' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setStatusFilter('inactive')}
+                className="flex-1"
+              >
+                Inactifs
+              </Button>
+            </div>
           </div>
 
           {/* Forecast Source Filter */}
-          <div className="flex items-center gap-2 border rounded-lg p-1">
-            <Button
-              variant={sourceFilter === 'all' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setSourceFilter('all')}
-            >
-              Toutes sources
-            </Button>
-            <Button
-              variant={sourceFilter === 'stormglass' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setSourceFilter('stormglass')}
-            >
-              Stormglass
-            </Button>
-            <Button
-              variant={sourceFilter === 'open-meteo' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setSourceFilter('open-meteo')}
-            >
-              Open-Meteo
-            </Button>
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground">Source prévisions</label>
+            <div className="flex items-center gap-1 border rounded-lg p-1">
+              <Button
+                variant={sourceFilter === 'all' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setSourceFilter('all')}
+                className="flex-1"
+              >
+                Toutes
+              </Button>
+              <Button
+                variant={sourceFilter === 'stormglass' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setSourceFilter('stormglass')}
+                className="flex-1"
+              >
+                Stormglass
+              </Button>
+              <Button
+                variant={sourceFilter === 'open-meteo' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setSourceFilter('open-meteo')}
+                className="flex-1"
+              >
+                Open-Meteo
+              </Button>
+            </div>
+          </div>
+
+          {/* Tide Source Filter */}
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground">Source marées</label>
+            <div className="flex items-center gap-1 border rounded-lg p-1">
+              <Button
+                variant={tideFilter === 'all' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setTideFilter('all')}
+                className="flex-1"
+              >
+                Toutes
+              </Button>
+              <Button
+                variant={tideFilter === 'with-source' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setTideFilter('with-source')}
+                className="flex-1"
+              >
+                Avec source
+              </Button>
+              <Button
+                variant={tideFilter === 'no-source' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setTideFilter('no-source')}
+                className="flex-1"
+              >
+                Sans source
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -168,13 +221,17 @@ export function SpotsTable({ spots }: SpotsTableProps) {
                   <div className="space-y-1">
                     {spot.tide_source ? (
                       <>
-                        <Badge variant="outline">Mareepeche</Badge>
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          ✓ Mareepeche
+                        </Badge>
                         <div className="text-xs text-muted-foreground">
                           {formatTimestamp(spot.tide_updated_at)}
                         </div>
                       </>
                     ) : (
-                      <span className="text-xs text-muted-foreground">Aucune donnée</span>
+                      <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                        ✗ Pas de source
+                      </Badge>
                     )}
                   </div>
                 </TableCell>

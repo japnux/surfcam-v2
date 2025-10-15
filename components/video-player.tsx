@@ -31,8 +31,40 @@ export function VideoPlayer({ src, type, spotName }: VideoPlayerProps) {
       setLoading(false)
     }
 
+    // Fix iOS fullscreen exit zoom issue
+    const handleFullscreenChange = () => {
+      // Reset viewport on iOS when exiting fullscreen
+      if (document.fullscreenElement === null) {
+        // Force viewport reset
+        const viewport = document.querySelector('meta[name="viewport"]')
+        if (viewport) {
+          const content = viewport.getAttribute('content') || ''
+          viewport.setAttribute('content', content)
+        }
+        // Scroll to top to ensure proper positioning
+        window.scrollTo(0, 0)
+      }
+    }
+
+    // iOS-specific fullscreen exit handler
+    const handleWebkitEndFullscreen = () => {
+      // Reset zoom by forcing viewport recalculation
+      const viewport = document.querySelector('meta[name="viewport"]')
+      if (viewport) {
+        const content = viewport.getAttribute('content') || ''
+        // Temporarily change and restore to force recalculation
+        viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0')
+        setTimeout(() => {
+          viewport.setAttribute('content', content)
+        }, 100)
+      }
+      window.scrollTo(0, 0)
+    }
+
     video.addEventListener('loadeddata', handleLoadedData)
     video.addEventListener('error', handleError)
+    video.addEventListener('fullscreenchange', handleFullscreenChange)
+    video.addEventListener('webkitendfullscreen', handleWebkitEndFullscreen)
 
     // For HLS streams, load hls.js if needed
     if (type === 'hls' && src.includes('.m3u8')) {
@@ -72,6 +104,8 @@ export function VideoPlayer({ src, type, spotName }: VideoPlayerProps) {
     return () => {
       video.removeEventListener('loadeddata', handleLoadedData)
       video.removeEventListener('error', handleError)
+      video.removeEventListener('fullscreenchange', handleFullscreenChange)
+      video.removeEventListener('webkitendfullscreen', handleWebkitEndFullscreen)
     }
   }, [src, type])
 

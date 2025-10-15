@@ -215,11 +215,36 @@ export function getNextTideEvents(tides: TideData, count: number = 2): TideEvent
 }
 
 export function getCurrentTideHeight(tides: TideData): number {
+  if (!tides.hourly.length) return 0
+  
   const now = new Date()
-  const currentHour = tides.hourly.find(h => {
+  const nowTimestamp = now.getTime()
+  
+  // Filter out past data (older than 1 hour ago)
+  const oneHourAgo = nowTimestamp - (60 * 60 * 1000)
+  const recentData = tides.hourly.filter(h => {
     const hourTime = new Date(h.time)
-    return hourTime.getHours() === now.getHours()
+    return hourTime.getTime() >= oneHourAgo
   })
   
-  return currentHour?.height || 0
+  if (recentData.length === 0) {
+    // No recent data, return 0
+    return 0
+  }
+  
+  // Find the closest hour to now
+  let closest = recentData[0]
+  let smallestDiff = Math.abs(new Date(recentData[0].time).getTime() - nowTimestamp)
+  
+  for (const hour of recentData) {
+    const hourTime = new Date(hour.time).getTime()
+    const diff = Math.abs(hourTime - nowTimestamp)
+    
+    if (diff < smallestDiff) {
+      smallestDiff = diff
+      closest = hour
+    }
+  }
+  
+  return closest.height
 }

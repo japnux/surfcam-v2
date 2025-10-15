@@ -2,7 +2,8 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getSpotBySlug, getActiveSpots } from '@/lib/data/spots'
 import { getCurrentConditions } from '@/lib/api/forecast'
-import { TideData, getTides, getNextTideEvents, getCurrentTideHeight } from '@/lib/api/tides'
+import { TideData, TideEvent, HourlyTide, getNextTideEvents, getCurrentTideHeight } from '@/lib/api/tides'
+import { getTidesForSpotMultipleDays } from '@/lib/data/tides'
 import { ForecastData, getForecast, getForecastSourceName } from '@/lib/data/forecast'
 import { isFavorite } from '@/lib/data/favorites'
 import { createClient } from '@/lib/supabase/server'
@@ -39,6 +40,56 @@ import { config } from '@/lib/config'
 import { Info } from 'lucide-react'
 
 export const revalidate = 1800 // 30 minutes - optimisation performance
+
+// Helper function to generate hourly tide data from tide events
+function generateHourlyTideData(events: TideEvent[]): HourlyTide[] {
+  if (events.length < 2) return []
+  
+  const hourly: HourlyTide[] = []
+  const now = new Date()
+  
+  // Sort events by time
+  const sortedEvents = [...events].sort((a, b) => 
+    new Date(a.time).getTime() - new Date(b.time).getTime()
+  )
+  
+  // Generate hourly data for the next 7 days
+  for (let hour = 0; hour < 168; hour++) {
+    const date = new Date(now)
+    date.setHours(date.getHours() + hour)
+    const currentTime = date.getTime()
+    
+    // Find surrounding tide events
+    let prevEvent = sortedEvents[0]
+    let nextEvent = sortedEvents[1]
+    
+    for (let i = 0; i < sortedEvents.length - 1; i++) {
+      const eventTime = new Date(sortedEvents[i].time).getTime()
+      const nextEventTime = new Date(sortedEvents[i + 1].time).getTime()
+      
+      if (currentTime >= eventTime && currentTime <= nextEventTime) {
+        prevEvent = sortedEvents[i]
+        nextEvent = sortedEvents[i + 1]
+        break
+      }
+    }
+    
+    // Linear interpolation between tide events
+    const prevTime = new Date(prevEvent.time).getTime()
+    const nextTime = new Date(nextEvent.time).getTime()
+    const timeDiff = nextTime - prevTime
+    const timeProgress = (currentTime - prevTime) / timeDiff
+    
+    const height = prevEvent.height + (nextEvent.height - prevEvent.height) * timeProgress
+    
+    hourly.push({
+      time: date.toISOString(),
+      height: Math.max(0, height),
+    })
+  }
+  
+  return hourly
+}
 
 interface SpotPageProps {
   params: Promise<{ slug: string }>
@@ -105,11 +156,14 @@ export default async function SpotPage({ params }: SpotPageProps) {
   let forecastError: string | null = null
   let forecastSource = 'Non disponible'
 
+  let mareepecheCoefficient: number | null = null
+  
   try {
     // Optimisation: paralléliser les requêtes avec Promise.allSettled pour continuer même si une échoue
-    const [forecastResult, tidesResult] = await Promise.allSettled([
+    const [forecastResult, mareepecheTidesResult, mareepecheDataResult] = await Promise.allSettled([
       getForecast(spot),
-      getTides(spot.latitude, spot.longitude, spot.id)
+      getTidesForSpotMultipleDays(spot.id, 3), // Get 3 days of mareespeche data
+      import('@/lib/data/tides').then(m => m.getTidesForSpot(spot.id)) // Get today's data with coefficient
     ])
     
     if (forecastResult.status === 'fulfilled') {
@@ -121,10 +175,48 @@ export default async function SpotPage({ params }: SpotPageProps) {
       forecastData = { hourly: [], daily: [], tides: [], meta: { source: 'open-meteo' } } as ForecastData
     }
     
-    if (tidesResult.status === 'fulfilled') {
-      tides = tidesResult.value
+    // Extract coefficient from mareespeche data
+    if (mareepecheDataResult.status === 'fulfilled' && mareepecheDataResult.value?.coefficient) {
+      mareepecheCoefficient = parseInt(mareepecheDataResult.value.coefficient)
+      console.log(`✅ Using mareespeche.com coefficient for ${spot.name}: ${mareepecheCoefficient}`)
+    }
+    
+    // Use mareespeche data directly (no Stormglass call)
+    if (mareepecheTidesResult.status === 'fulfilled' && mareepecheTidesResult.value.length > 0) {
+      const mareepecheTides = mareepecheTidesResult.value
+      const now = new Date()
+      
+      // Convert mareespeche format to TideEvent format
+      const allMareepecheEvents: TideEvent[] = mareepecheTides.map((t: any, index) => {
+        const [hours, minutes] = t.time.split('h').map(Number)
+        const date = new Date()
+        
+        // Distribute tides across days based on their order (assuming ~4 tides per day)
+        const dayOffset = Math.floor(index / 4)
+        date.setDate(date.getDate() + dayOffset)
+        date.setHours(hours, minutes, 0, 0)
+        
+        return {
+          time: date.toISOString(),
+          height: t.type === 'high' ? 4.8 : 1.2, // Estimated heights
+          type: t.type
+        }
+      })
+      
+      // Filter future tides for events
+      const futureEvents = allMareepecheEvents.filter(t => new Date(t.time).getTime() > now.getTime())
+      
+      // Generate hourly data from all events (for tide height interpolation)
+      const hourly = generateHourlyTideData(allMareepecheEvents)
+      
+      tides = {
+        events: futureEvents,
+        hourly: hourly
+      }
+      
+      console.log(`✅ Using mareespeche.com data for ${spot.name}: ${futureEvents.length} tide events, ${hourly.length} hourly points`)
     } else {
-      console.error(`Tides error for ${spot.name}:`, tidesResult.reason)
+      console.warn(`⚠️  No mareespeche data for ${spot.name}, tide data will be empty`)
       tides = { events: [], hourly: [] }
     }
   } catch (error) {
@@ -139,8 +231,8 @@ export default async function SpotPage({ params }: SpotPageProps) {
   const currentTideHeight = getCurrentTideHeight(tides)
   
   // Calculate tide coefficient from amplitude (French system: 20-120)
-  // Formula: coefficient ≈ amplitude / 0.051
-  const tideCoefficient = (() => {
+  // Use mareespeche coefficient if available, otherwise calculate from amplitude
+  const tideCoefficient = mareepecheCoefficient || (() => {
     const nextHigh = nextTides.find(t => t.type === 'high')
     const nextLow = nextTides.find(t => t.type === 'low')
     

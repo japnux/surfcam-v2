@@ -143,10 +143,33 @@ export function getCurrentConditions(forecast: ForecastData): HourlyForecast | n
   if (!forecast.hourly.length) return null
   
   const now = new Date()
-  const currentHour = forecast.hourly.find(h => {
+  const nowTimestamp = now.getTime()
+  
+  // Filter out past data (older than 1 hour ago to account for slight delays)
+  const oneHourAgo = nowTimestamp - (60 * 60 * 1000)
+  const recentData = forecast.hourly.filter(h => {
     const hourTime = new Date(h.time)
-    return hourTime.getHours() === now.getHours()
+    return hourTime.getTime() >= oneHourAgo
   })
   
-  return currentHour || forecast.hourly[0]
+  if (recentData.length === 0) {
+    // No recent data, return the last available entry
+    return forecast.hourly[forecast.hourly.length - 1]
+  }
+  
+  // Find the closest hour to now (could be current hour or next hour)
+  let closest = recentData[0]
+  let smallestDiff = Math.abs(new Date(recentData[0].time).getTime() - nowTimestamp)
+  
+  for (const hour of recentData) {
+    const hourTime = new Date(hour.time).getTime()
+    const diff = Math.abs(hourTime - nowTimestamp)
+    
+    if (diff < smallestDiff) {
+      smallestDiff = diff
+      closest = hour
+    }
+  }
+  
+  return closest
 }

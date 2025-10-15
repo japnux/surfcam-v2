@@ -23,6 +23,12 @@ export const metadata: Metadata = {
   authors: [{ name: config.siteName }],
   creator: config.siteName,
   metadataBase: new URL(config.siteUrl),
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
   openGraph: {
     type: 'website',
     locale: config.locale,

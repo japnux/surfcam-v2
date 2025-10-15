@@ -1,6 +1,5 @@
 import { TideData } from '@/lib/api/tides'
 import { DailyData } from '@/lib/api/forecast'
-import { getTidesForSpot } from '@/lib/data/tides'
 import { ArrowUp, ArrowDown, Sunrise, Sunset, Droplets } from 'lucide-react'
 
 interface TideInfoProps {
@@ -11,36 +10,15 @@ interface TideInfoProps {
 }
 
 export async function TideInfo({ spotId, tides, sunData, tideCoefficient }: TideInfoProps) {
-  // Get cached tide data from mareespeche.com
-  const cachedTides = await getTidesForSpot(spotId);
-  
   const now = new Date()
   
-  // Use cached tides if available, otherwise fallback to API tides
-  const tidesData = cachedTides?.tides || tides.events
+  // Get next 2 tide events from the tides prop (already includes mareespeche data if available)
+  const nextTides = tides.events
+    .filter(e => new Date(e.time).getTime() > now.getTime())
+    .slice(0, 2)
   
-  // Get next 2 tide events
-  const nextTides = cachedTides?.tides 
-    ? cachedTides.tides
-        .map(t => {
-          const [hours, minutes] = t.time.split('h').map(Number)
-          // Créer la date pour aujourd'hui en heure locale (France)
-          const tideTime = new Date()
-          tideTime.setHours(hours, minutes, 0, 0)
-          return {
-            time: tideTime.toISOString(),
-            type: t.type,
-            height: 0,
-            sortTime: tideTime.getTime()
-          }
-        })
-        .sort((a, b) => a.sortTime - b.sortTime) // Sort by time
-        .filter(t => new Date(t.time).getTime() > now.getTime()) // Filter future tides
-        .slice(0, 2) // Take first 2
-    : tides.events.filter(e => new Date(e.time).getTime() > now.getTime()).slice(0, 2)
-  
-  // Use coefficient from cached data if available
-  const coefficient = cachedTides?.coefficient ? parseInt(cachedTides.coefficient) : tideCoefficient
+  // Use the coefficient passed as prop
+  const coefficient = tideCoefficient
   
   // Determine next sun event (sunrise or sunset)
   const nextSunEvent = (() => {
@@ -75,26 +53,6 @@ export async function TideInfo({ spotId, tides, sunData, tideCoefficient }: Tide
     <div className="bg-card border border-border rounded-lg p-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-medium text-muted-foreground">Marées/Soleil</h3>
-        {cachedTides && (
-          <span className="text-xs text-muted-foreground">
-            Source: Mareespeche.com
-            {cachedTides.updated_at && (
-              <span className="ml-1">
-                ({new Date(cachedTides.updated_at).toLocaleString('fr-FR', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })})
-                {new Date(cachedTides.expires_at) < new Date() && (
-                  <span className="text-orange-500 ml-1" title="Les données ont expiré et devraient être mises à jour">
-                    ⚠️ Expiré
-                  </span>
-                )}
-              </span>
-            )}
-          </span>
-        )}
       </div>
       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-y-4 items-center">

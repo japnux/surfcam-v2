@@ -187,17 +187,24 @@ export async function getStormglassForecastCached(
     // 3. Fetch fresh data from Stormglass (forecast only, tides come from Mareepeche)
     console.log(`🌊 Fetching fresh Stormglass data for spot ${spotId} (${callCount + 1}/${DAILY_LIMIT})`)
     
-    const forecast = await getStormglassForecast(lat, lng)
+    let forecast
+    let errorDetails = ''
+    
+    try {
+      forecast = await getStormglassForecast(lat, lng)
+    } catch (error: any) {
+      errorDetails = error?.message || 'Unknown error'
+    }
 
     if (!forecast) {
       console.error('Failed to fetch Stormglass forecast, falling back to Open-Meteo')
       
-      // Log failed call
+      // Log failed call with details
       await logStormglassCall({
         spotId,
         endpoint: 'forecast',
         status: 'error',
-        errorMessage: 'Failed to fetch forecast',
+        errorMessage: errorDetails || 'API returned no data',
         latitude: lat,
         longitude: lng,
       })
