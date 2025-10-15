@@ -47,7 +47,7 @@ export function ForecastTable({ hourly, tideHourly, tideEvents, daily, hoursToSh
           </tr>
         </thead>
         <tbody>
-          {displayData.map((hour, index) => {
+          {displayData.map((hour, hourIndex) => {
             const date = new Date(hour.time)
             
             // Find corresponding tide height
@@ -58,29 +58,21 @@ export function ForecastTable({ hourly, tideHourly, tideEvents, daily, hoursToSh
             
             // Determine if tide is rising or falling based on next tide event
             const isTideRising = tideData && tideEvents ? (() => {
-              const currentTime = date.getTime()
-              // Find the next tide event (high or low)
-              const nextEvent = tideEvents.find(e => new Date(e.time).getTime() > currentTime)
-              if (!nextEvent) return null
-              // If next event is high tide, we're rising. If low tide, we're falling.
-              return nextEvent.type === 'high'
+              const nextTide = tideEvents.find(t => new Date(t.time) > date)
+              return nextTide?.type === 'high'
             })() : null
-            const timeStr = date.toLocaleTimeString('fr-FR', {
-              hour: '2-digit',
-              minute: '2-digit',
-            })
-            const dateStr = date.toLocaleDateString('fr-FR', {
-              weekday: 'short',
-              day: 'numeric',
-            })
-            const fullDateStr = date.toLocaleDateString('fr-FR', {
-              weekday: 'long',
-              day: 'numeric',
+            
+            const timeStr = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+            const dateStr = date.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })
+            const fullDateStr = date.toLocaleDateString('fr-FR', { 
+              weekday: 'long', 
+              day: 'numeric', 
               month: 'long',
+              year: 'numeric'
             })
             
             // Check if this is a new day (00:00 or first entry)
-            const prevDate = index > 0 ? new Date(displayData[index - 1].time) : null
+            const prevDate = hourIndex > 0 ? new Date(displayData[hourIndex - 1].time) : null
             const isNewDay = !prevDate || prevDate.getDate() !== date.getDate()
             
             // Get sunrise/sunset for this day
@@ -94,7 +86,7 @@ export function ForecastTable({ hourly, tideHourly, tideEvents, daily, hoursToSh
             const sunset = dayData?.sunset ? new Date(dayData.sunset) : null
             
             // Check if we should show sunrise/sunset in this row
-            const nextHour = index < displayData.length - 1 ? new Date(displayData[index + 1].time) : null
+            const nextHour = hourIndex < displayData.length - 1 ? new Date(displayData[hourIndex + 1].time) : null
             const showSunrise = sunrise && date <= sunrise && (!nextHour || nextHour > sunrise)
             const showSunset = sunset && date <= sunset && (!nextHour || nextHour > sunset)
             
@@ -147,9 +139,7 @@ export function ForecastTable({ hourly, tideHourly, tideEvents, daily, hoursToSh
                 
                 <tr
                   key={hour.time}
-                  className={`border-b border-border hover:bg-accent/50 transition-colors ${
-                    index % 3 === 0 ? 'bg-accent/20' : ''
-                  }`}
+                  className="border-b border-border hover:bg-accent/50 transition-colors"
                 >
                   <td className="p-3 font-medium whitespace-nowrap">
                     <div>{timeStr}</div>

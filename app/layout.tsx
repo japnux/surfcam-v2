@@ -13,6 +13,13 @@ const inter = Inter({
   preload: true
 })
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+}
+
 export const metadata: Metadata = {
   title: {
     default: config.siteName,
@@ -23,12 +30,6 @@ export const metadata: Metadata = {
   authors: [{ name: config.siteName }],
   creator: config.siteName,
   metadataBase: new URL(config.siteUrl),
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
   openGraph: {
     type: 'website',
     locale: config.locale,

@@ -1,91 +1,92 @@
-import { type ClassValue, clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function getWindDirectionArrow(degrees: number): string {
+// Formatting utilities for forecast data
+export function formatWaveHeight(height: number | null | undefined): string {
+  if (height === null || height === undefined) return 'N/A'
+  return `${height.toFixed(1)}m`
+}
+
+export function formatWindSpeed(speed: number | null | undefined): string {
+  if (speed === null || speed === undefined) return 'N/A'
+  return `${Math.round(speed)} km/h`
+}
+
+export function formatTemperature(temp: number | null | undefined): string {
+  if (temp === null || temp === undefined) return 'N/A'
+  return `${Math.round(temp)}°`
+}
+
+export function formatPeriod(period: number | null | undefined): string {
+  if (period === null || period === undefined) return 'N/A'
+  return `${Math.round(period)}s`
+}
+
+export function formatDirection(degrees: number | null | undefined): string {
+  if (degrees === null || degrees === undefined) return 'N/A'
+  
+  const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSO', 'SO', 'OSO', 'O', 'ONO', 'NO', 'NNO']
+  const index = Math.round(degrees / 22.5) % 16
+  return `${directions[index]} (${Math.round(degrees)}°)`
+}
+
+export function getWindDirectionArrow(degrees: number | null | undefined): string {
+  if (degrees === null || degrees === undefined) return '○'
+  
   const arrows = ['↓', '↙', '←', '↖', '↑', '↗', '→', '↘']
   const index = Math.round(degrees / 45) % 8
   return arrows[index]
 }
 
-export function getDirectionName(degrees: number): string {
-  const directions = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO']
-  const index = Math.round(degrees / 45) % 8
-  return directions[index]
-}
-
-export function formatDirection(degrees: number): string {
-  return `${getDirectionName(degrees)} (${Math.round(degrees)}°)`
-}
-
-export function getSwellDirectionArrow(degrees: number): string {
-  return getWindDirectionArrow(degrees)
-}
-
-export function formatWaveHeight(meters: number): string {
-  return `${meters.toFixed(1)}m`
-}
-
-export function formatWindSpeed(kmh: number): string {
-  return `${Math.round(kmh)} km/h`
-}
-
-export function formatTemperature(celsius: number): string {
-  return `${Math.round(celsius)}°C`
-}
-
-export function formatPeriod(seconds: number): string {
-  return `${Math.round(seconds)}s`
-}
-
-export function formatSwellPower(kwPerMeter: number): string {
-  return `${kwPerMeter.toFixed(1)} kW/m`
-}
-
-export function formatWaveEnergy(kj: number): string {
-  if (kj >= 1000) {
-    return `${(kj / 1000).toFixed(1)} MJ`
-  }
-  return `${Math.round(kj)} kJ`
-}
-
-export function slugify(text: string): string {
-  return text
-    .toString()
-    .toLowerCase()
-    .replace(/\s+/g, '-')       // Replace spaces with -
-    .replace(/[\'\"\’]/g, '')    // Remove apostrophes and quotes
-    .replace(/[^\w\-]+/g, '')   // Remove all non-word chars
-    .replace(/\-\-+/g, '-')     // Replace multiple - with single -
-    .replace(/^-+/, '')          // Trim - from start of text
-    .replace(/-+$/, '')         // Trim - from end of text
-}
-
-export function getTidePhase(height: number, nextHigh?: number, nextLow?: number): string {
-  if (!nextHigh || !nextLow) return 'Inconnue'
+export function formatSwellPower(power: number | null | undefined): string {
+  if (power === null || power === undefined || power === 0) return ''
   
-  const midpoint = (nextHigh + nextLow) / 2
-  if (height > midpoint) {
-    return height > nextHigh * 0.9 ? 'Haute' : 'Montante'
-  } else {
-    return height < nextLow * 1.1 ? 'Basse' : 'Descendante'
-  }
+  if (power < 500) return '⚡ Faible'
+  if (power < 1000) return '⚡⚡ Moyen'
+  if (power < 2000) return '⚡⚡⚡ Fort'
+  return '⚡⚡⚡⚡ Très fort'
 }
 
+export function getTidePhase(
+  currentHeight: number,
+  nextHighHeight?: number,
+  nextLowHeight?: number
+): string {
+  if (!nextHighHeight && !nextLowHeight) return 'Marée inconnue'
+  
+  // If we have both high and low, determine phase based on current height
+  if (nextHighHeight && nextLowHeight) {
+    const midPoint = (nextHighHeight + nextLowHeight) / 2
+    return currentHeight < midPoint ? 'Montante' : 'Descendante'
+  }
+  
+  // If we only have high, we're going towards it (rising)
+  if (nextHighHeight) return 'Montante'
+  
+  // If we only have low, we're going towards it (falling)
+  return 'Descendante'
+}
+
+// Debounce utility
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout | null = null
+  
   return function executedFunction(...args: Parameters<T>) {
     const later = () => {
       timeout = null
       func(...args)
     }
-    if (timeout) clearTimeout(timeout)
+    
+    if (timeout) {
+      clearTimeout(timeout)
+    }
     timeout = setTimeout(later, wait)
   }
 }

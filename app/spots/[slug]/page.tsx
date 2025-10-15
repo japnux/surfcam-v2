@@ -8,6 +8,7 @@ import { ForecastData, getForecast, getForecastSourceName } from '@/lib/data/for
 import { isFavorite } from '@/lib/data/favorites'
 import { createClient } from '@/lib/supabase/server'
 import { VideoPlayer } from '@/components/video-player-lazy'
+import { ForecastTabs } from '@/components/forecast-tabs'
 import dynamic from 'next/dynamic'
 
 // Lazy load heavy components for better FCP
@@ -400,15 +401,12 @@ export default async function SpotPage({ params }: SpotPageProps) {
               {forecastError && <span className="text-destructive ml-2">⚠️ {forecastError}</span>}
             </span>
           </div>
-          <div className="bg-card border border-border rounded-lg overflow-hidden">
-            <ForecastTable
-              hourly={forecastData.hourly}
-              tideHourly={tides.hourly}
-              tideEvents={tides.events}
-              daily={forecastData.daily}
-              hoursToShow={48}
-            />
-          </div>
+          <ForecastTabs
+            hourly={forecastData.hourly}
+            tideHourly={tides.hourly}
+            tideEvents={tides.events}
+            daily={forecastData.daily}
+          />
         </div>
 
 
