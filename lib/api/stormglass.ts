@@ -1,4 +1,5 @@
 import { config } from '@/lib/config'
+import { logStormglassCall } from './stormglass-logger'
 
 export interface StormglassDataPoint {
   time: string
@@ -111,7 +112,27 @@ export async function getStormglassForecast(
 
         if (response.status === 402) {
           console.warn(`⚠️  API key ${i + 1} quota exceeded (402), trying next key...`)
+          
+          // Log quota exceeded error
+          await logStormglassCall({
+            spotId: null,
+            endpoint: 'forecast',
+            status: 'quota_exceeded',
+            errorMessage: `API key ${i + 1} quota exceeded (HTTP 402)`,
+            latitude: lat,
+            longitude: lng,
+          })
+          
           if (i === STORMGLASS_API_KEYS.length - 1) {
+            // Log final failure
+            await logStormglassCall({
+              spotId: null,
+              endpoint: 'forecast',
+              status: 'quota_exceeded',
+              errorMessage: 'All API keys quota exceeded (HTTP 402)',
+              latitude: lat,
+              longitude: lng,
+            })
             throw new Error('HTTP 402: All API keys quota exceeded')
           }
           break // Try next API key
