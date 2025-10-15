@@ -100,7 +100,7 @@ export function ForecastTable({ hourly, tideHourly, tideEvents, daily, hoursToSh
             return (
               <>
                 {isNewDay && (
-                  <tr className="bg-primary/10 border-t-2 border-t-primary/40">
+                  <tr key={`day-${hour.time}`} className="bg-primary/10 border-t-2 border-t-primary/40">
                     <td colSpan={5} className="p-2 text-sm font-semibold text-primary">
                       {fullDateStr.charAt(0).toUpperCase() + fullDateStr.slice(1)}
                     </td>
