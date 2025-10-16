@@ -6,15 +6,15 @@ export type SpotInsert = TablesInsert<'spots'>;
 export type SpotUpdate = TablesUpdate<'spots'>;
 
 // Type pour les spots avec champs limités (optimisation)
-export type SpotPreview = Pick<Spot, 'id' | 'name' | 'slug' | 'break_type' | 'level'>;
+export type SpotPreview = Pick<Spot, 'id' | 'name' | 'slug' | 'break_type' | 'level' | 'latitude' | 'longitude' | 'city' | 'region' | 'cam_url' | 'cam_type'>;
 
 export async function getActiveSpots(limit?: number): Promise<SpotPreview[]> {
   const supabase = await createServiceClient();
   
-  // Optimisation: sélectionner uniquement les champs nécessaires pour la page d'accueil
+  // Optimisation: sélectionner uniquement les champs nécessaires pour la page d'accueil et l'app mobile
   let query = supabase
     .from('spots')
-    .select('id, name, slug, break_type, level')
+    .select('id, name, slug, break_type, level, latitude, longitude, city, region, cam_url, cam_type')
     .eq('is_active', true)
     .order('name');
   
