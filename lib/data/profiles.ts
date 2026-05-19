@@ -1,9 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { Database } from '@/lib/supabase/types'
 
-export type Profile = Database['public']['Tables']['profiles']['Row']
-export type ProfileInsert = Database['public']['Tables']['profiles']['Insert']
-export type ProfileUpdate = Database['public']['Tables']['profiles']['Update']
+export type Profile = Database['surf']['Tables']['profiles']['Row']
+export type ProfileInsert = Database['surf']['Tables']['profiles']['Insert']
+export type ProfileUpdate = Database['surf']['Tables']['profiles']['Update']
 
 export async function getProfile(userId: string) {
   const supabase = await createClient()

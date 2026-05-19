@@ -9,10 +9,11 @@ export async function updateSession(request: NextRequest) {
     },
   })
 
-  const supabase = createServerClient<Database>(
+  const supabase = createServerClient<Database, "surf">(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      db: { schema: "surf" },
       cookies: {
         get(name: string) {
           return request.cookies.get(name)?.value

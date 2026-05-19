@@ -7,86 +7,86 @@ export type Json =
   | Json[]
 
 export type Database = {
-  public: {
+  surf: {
     Tables: {
       spots: {
         Row: {
           id: string
-          name: string
           slug: string
+          name: string
+          country: string
           region: string
           city: string | null
-          country: string
           latitude: number
           longitude: number
-          cam_url: string
-          cam_type: string
+          timezone: string
           break_type: string | null
-          level: string | null
           orientation: string | null
+          level: string | null
+          hazards: string | null
           best_tide: string | null
           best_wind: string | null
-          hazards: string | null
+          cam_url: string
+          cam_type: string
           license_credit: string | null
-          shom_url: string | null
           is_active: boolean
-          has_daily_forecast: boolean
-          timezone: string
-          shom_station: string | null
           created_at: string | null
           updated_at: string | null
+          has_daily_forecast: boolean
+          shom_station: string | null
+          shom_url: string | null
         }
         Insert: {
           id?: string
-          name: string
           slug: string
+          name: string
+          country: string
           region: string
           city?: string | null
-          country?: string
           latitude: number
           longitude: number
-          cam_url: string
-          cam_type: string
+          timezone?: string
           break_type?: string | null
-          level?: string | null
           orientation?: string | null
+          level?: string | null
+          hazards?: string | null
           best_tide?: string | null
           best_wind?: string | null
-          hazards?: string | null
+          cam_url: string
+          cam_type: string
           license_credit?: string | null
-          shom_url?: string | null
           is_active?: boolean
-          has_daily_forecast?: boolean
-          timezone?: string
-          shom_station?: string | null
           created_at?: string | null
           updated_at?: string | null
+          has_daily_forecast?: boolean
+          shom_station?: string | null
+          shom_url?: string | null
         }
         Update: {
           id?: string
-          name?: string
           slug?: string
+          name?: string
+          country?: string
           region?: string
           city?: string | null
-          country?: string
           latitude?: number
           longitude?: number
-          cam_url?: string
-          cam_type?: string
+          timezone?: string
           break_type?: string | null
-          level?: string | null
           orientation?: string | null
+          level?: string | null
+          hazards?: string | null
           best_tide?: string | null
           best_wind?: string | null
-          hazards?: string | null
+          cam_url?: string
+          cam_type?: string
           license_credit?: string | null
-          shom_url?: string | null
           is_active?: boolean
-          has_daily_forecast?: boolean
-          timezone?: string
-          shom_station?: string | null
           created_at?: string | null
           updated_at?: string | null
+          has_daily_forecast?: boolean
+          shom_station?: string | null
+          shom_url?: string | null
         }
       }
       profiles: {
@@ -117,22 +117,161 @@ export type Database = {
       }
       favorites: {
         Row: {
-          id: string
           user_id: string
           spot_id: string
-          created_at: string
+          created_at: string | null
+        }
+        Insert: {
+          user_id: string
+          spot_id: string
+          created_at?: string | null
+        }
+        Update: {
+          user_id?: string
+          spot_id?: string
+          created_at?: string | null
+        }
+      }
+      spot_comments: {
+        Row: {
+          id: string
+          spot_id: string
+          user_id: string
+          content: string
+          is_archived: boolean
+          created_at: string | null
+          updated_at: string | null
         }
         Insert: {
           id?: string
-          user_id: string
           spot_id: string
-          created_at?: string
+          user_id: string
+          content: string
+          is_archived?: boolean
+          created_at?: string | null
+          updated_at?: string | null
         }
         Update: {
           id?: string
-          user_id?: string
           spot_id?: string
-          created_at?: string
+          user_id?: string
+          content?: string
+          is_archived?: boolean
+          created_at?: string | null
+          updated_at?: string | null
+        }
+      }
+      comment_votes: {
+        Row: {
+          comment_id: string
+          user_id: string
+          vote_type: number
+          created_at: string | null
+        }
+        Insert: {
+          comment_id: string
+          user_id: string
+          vote_type: number
+          created_at?: string | null
+        }
+        Update: {
+          comment_id?: string
+          user_id?: string
+          vote_type?: number
+          created_at?: string | null
+        }
+      }
+      spot_forecast_cache: {
+        Row: {
+          id: string
+          spot_id: string
+          payload: Json
+          fetched_at: string | null
+          source: string | null
+          valid_until: string | null
+          data_start: string | null
+          data_end: string | null
+        }
+        Insert: {
+          id?: string
+          spot_id: string
+          payload: Json
+          fetched_at?: string | null
+          source?: string | null
+          valid_until?: string | null
+          data_start?: string | null
+          data_end?: string | null
+        }
+        Update: {
+          id?: string
+          spot_id?: string
+          payload?: Json
+          fetched_at?: string | null
+          source?: string | null
+          valid_until?: string | null
+          data_start?: string | null
+          data_end?: string | null
+        }
+      }
+      stormglass_api_calls: {
+        Row: {
+          id: string
+          call_date: string
+          call_count: number
+          last_reset_at: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          call_date?: string
+          call_count?: number
+          last_reset_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          call_date?: string
+          call_count?: number
+          last_reset_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+      }
+      stormglass_logs: {
+        Row: {
+          id: string
+          spot_id: string | null
+          endpoint: string
+          status: string
+          response_summary: Json | null
+          error_message: string | null
+          latitude: number | null
+          longitude: number | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          spot_id?: string | null
+          endpoint: string
+          status: string
+          response_summary?: Json | null
+          error_message?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          spot_id?: string | null
+          endpoint?: string
+          status?: string
+          response_summary?: Json | null
+          error_message?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          created_at?: string | null
         }
       }
       tides: {
@@ -142,8 +281,8 @@ export type Database = {
           date: string
           coefficient: string
           tides: Json
-          created_at: string
-          updated_at: string
+          created_at: string | null
+          updated_at: string | null
           expires_at: string
         }
         Insert: {
@@ -152,8 +291,8 @@ export type Database = {
           date: string
           coefficient: string
           tides: Json
-          created_at?: string
-          updated_at?: string
+          created_at?: string | null
+          updated_at?: string | null
           expires_at: string
         }
         Update: {
@@ -162,8 +301,8 @@ export type Database = {
           date?: string
           coefficient?: string
           tides?: Json
-          created_at?: string
-          updated_at?: string
+          created_at?: string | null
+          updated_at?: string | null
           expires_at?: string
         }
       }
@@ -180,7 +319,7 @@ export type Database = {
   }
 }
 
-// Helper types for easier access
-export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
-export type TablesInsert<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert']
-export type TablesUpdate<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update']
+// Helper types ciblant le schema "surf"
+export type Tables<T extends keyof Database['surf']['Tables']> = Database['surf']['Tables'][T]['Row']
+export type TablesInsert<T extends keyof Database['surf']['Tables']> = Database['surf']['Tables'][T]['Insert']
+export type TablesUpdate<T extends keyof Database['surf']['Tables']> = Database['surf']['Tables'][T]['Update']
