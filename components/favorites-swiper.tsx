@@ -14,9 +14,18 @@ interface FavoritesSwiperProps {
 // Seuil de déplacement (px) au-delà duquel un geste est considéré comme un swipe
 const SWIPE_THRESHOLD = 50
 
+// Nombre de spots préchargés de chaque côté du spot courant.
+// 1 => le précédent et le suivant sont déjà chargés (3 flux simultanés max).
+const PRELOAD_RADIUS = 1
+
 /**
  * Carrousel de spots favoris : on swipe horizontalement pour zapper
  * d'un spot à l'autre (même principe que le D-pad de l'app Android TV).
+ *
+ * Préchargement : les players des spots adjacents (±1) restent montés
+ * mais masqués, leur flux HLS est donc déjà chaud au moment du swipe.
+ * Les clés stables (key={spot.id}) font que les players communs sont
+ * conservés quand la fenêtre glisse — pas de rechargement.
  *
  * Mode immersif : un bouton plein écran bascule la caméra en overlay
  * plein écran. Sur Android/desktop on demande le vrai plein écran +
@@ -118,6 +127,33 @@ export function FavoritesSwiper({ spots }: FavoritesSwiperProps) {
 
   if (!spot) return null
 
+  // Fenêtre de spots montés simultanément (courant ± PRELOAD_RADIUS)
+  const windowStart = Math.max(0, safeIndex - PRELOAD_RADIUS)
+  const windowEnd = Math.min(spots.length - 1, safeIndex + PRELOAD_RADIUS)
+
+  // Pile de players : tous montés, seul le courant est visible.
+  // Les autres chargent leur flux en fond => swipe quasi instantané.
+  const videoStack = (
+    <>
+      {spots.slice(windowStart, windowEnd + 1).map((s, offset) => {
+        const i = windowStart + offset
+        const isCurrent = i === safeIndex
+        return (
+          <div
+            key={s.id}
+            aria-hidden={!isCurrent}
+            className={cn(
+              'absolute inset-0 transition-opacity duration-200',
+              isCurrent ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            )}
+          >
+            <VideoPlayer src={s.cam_url} type={s.cam_type} spotName={s.name} />
+          </div>
+        )
+      })}
+    </>
+  )
+
   // Flèches de navigation, superposées à la vidéo (desktop / accessibilité)
   const navArrows = (
     <>
@@ -195,13 +231,8 @@ export function FavoritesSwiper({ spots }: FavoritesSwiperProps) {
           onTouchEnd={handleTouchEnd}
         >
           {/* max-w borné à 177vh => la vidéo 16:9 ne dépasse jamais la hauteur écran */}
-          <div className="relative w-full max-w-[177vh]">
-            <VideoPlayer
-              key={spot.id}
-              src={spot.cam_url}
-              type={spot.cam_type}
-              spotName={spot.name}
-            />
+          <div className="relative w-full max-w-[177vh] aspect-video">
+            {videoStack}
             {navArrows}
           </div>
         </div>
@@ -229,14 +260,7 @@ export function FavoritesSwiper({ spots }: FavoritesSwiperProps) {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {/* key={spot.id} : remonte proprement le player à chaque changement de spot */}
-        <VideoPlayer
-          key={spot.id}
-          src={spot.cam_url}
-          type={spot.cam_type}
-          spotName={spot.name}
-        />
-
+        {videoStack}
         {navArrows}
 
         {/* Bouton plein écran immersif */}

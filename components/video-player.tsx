@@ -66,6 +66,12 @@ export function VideoPlayer({ src, type, spotName }: VideoPlayerProps) {
     video.addEventListener('fullscreenchange', handleFullscreenChange)
     video.addEventListener('webkitendfullscreen', handleWebkitEndFullscreen)
 
+    // Instance hls.js — conservée pour pouvoir la détruire au démontage
+    let hls: { destroy: () => void } | null = null
+    // Évite d'attacher une instance hls.js si le composant est démonté
+    // pendant le chargement asynchrone du module
+    let cancelled = false
+
     // For HLS streams, load hls.js if needed
     if (type === 'hls' && src.includes('.m3u8')) {
       if (video.canPlayType('application/vnd.apple.mpegurl')) {
@@ -74,20 +80,22 @@ export function VideoPlayer({ src, type, spotName }: VideoPlayerProps) {
       } else {
         // Load hls.js for other browsers
         import('hls.js').then(({ default: Hls }) => {
+          if (cancelled) return
           if (Hls.isSupported()) {
-            const hls = new Hls({
+            const instance = new Hls({
               xhrSetup: (xhr) => {
                 xhr.withCredentials = false // Allow CORS
               }
             })
-            hls.loadSource(src)
-            hls.attachMedia(video)
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            hls = instance
+            instance.loadSource(src)
+            instance.attachMedia(video)
+            instance.on(Hls.Events.MANIFEST_PARSED, () => {
               video.play().catch(() => {
                 // Autoplay might be blocked
               })
             })
-            hls.on(Hls.Events.ERROR, (event, data) => {
+            instance.on(Hls.Events.ERROR, (event, data) => {
               if (data.fatal) {
                 setError('Erreur lors du chargement du flux HLS.')
                 setLoading(false)
@@ -102,6 +110,13 @@ export function VideoPlayer({ src, type, spotName }: VideoPlayerProps) {
     }
 
     return () => {
+      cancelled = true
+      // Détruit l'instance hls.js pour libérer le flux (évite les
+      // téléchargements fantômes quand un player est démonté)
+      if (hls) {
+        hls.destroy()
+        hls = null
+      }
       video.removeEventListener('loadeddata', handleLoadedData)
       video.removeEventListener('error', handleError)
       video.removeEventListener('fullscreenchange', handleFullscreenChange)
