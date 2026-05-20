@@ -12,13 +12,36 @@ interface NearbySpotsSwiperProps {
 // Nombre de spots affichés dans le swiper
 const NEARBY_COUNT = 10
 
+// Point de référence par défaut quand la géolocalisation échoue :
+// Côte des Basques (Biarritz)
+const DEFAULT_LAT = 43.48
+const DEFAULT_LON = -1.57
+
 type GeoStatus = 'locating' | 'located' | 'unavailable'
+
+/**
+ * Trie les spots du plus proche au plus éloigné d'un point donné
+ * et garde les NEARBY_COUNT premiers.
+ */
+function nearestSpots(
+  spots: SpotPreview[],
+  lat: number,
+  lon: number
+): SpotPreview[] {
+  return [...spots]
+    .sort(
+      (a, b) =>
+        distanceKm(lat, lon, Number(a.latitude), Number(a.longitude)) -
+        distanceKm(lat, lon, Number(b.latitude), Number(b.longitude))
+    )
+    .slice(0, NEARBY_COUNT)
+}
 
 /**
  * Swiper de la home pour les visiteurs non connectés : géolocalise
  * l'utilisateur et trie les spots du plus proche au plus éloigné.
  * Si la géolocalisation est refusée / indisponible, on retombe sur
- * les premiers spots dans l'ordre par défaut.
+ * un tri par distance depuis la Côte des Basques (Biarritz).
  */
 export function NearbySpotsSwiper({ spots }: NearbySpotsSwiperProps) {
   const [status, setStatus] = useState<GeoStatus>('locating')
@@ -27,7 +50,7 @@ export function NearbySpotsSwiper({ spots }: NearbySpotsSwiperProps) {
   useEffect(() => {
     // Repli si l'API de géolocalisation n'existe pas
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
-      setOrdered(spots.slice(0, NEARBY_COUNT))
+      setOrdered(nearestSpots(spots, DEFAULT_LAT, DEFAULT_LON))
       setStatus('unavailable')
       return
     }
@@ -35,19 +58,12 @@ export function NearbySpotsSwiper({ spots }: NearbySpotsSwiperProps) {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords
-        const sorted = [...spots]
-          .sort(
-            (a, b) =>
-              distanceKm(latitude, longitude, a.latitude, a.longitude) -
-              distanceKm(latitude, longitude, b.latitude, b.longitude)
-          )
-          .slice(0, NEARBY_COUNT)
-        setOrdered(sorted)
+        setOrdered(nearestSpots(spots, latitude, longitude))
         setStatus('located')
       },
       () => {
-        // Refus ou timeout : on garde l'ordre par défaut
-        setOrdered(spots.slice(0, NEARBY_COUNT))
+        // Refus ou timeout : tri par défaut depuis la Côte des Basques
+        setOrdered(nearestSpots(spots, DEFAULT_LAT, DEFAULT_LON))
         setStatus('unavailable')
       },
       { timeout: 8000, maximumAge: 5 * 60 * 1000 }
