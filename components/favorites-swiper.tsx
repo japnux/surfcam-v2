@@ -147,7 +147,12 @@ export function FavoritesSwiper({ spots }: FavoritesSwiperProps) {
               isCurrent ? 'opacity-100' : 'opacity-0 pointer-events-none'
             )}
           >
-            <VideoPlayer src={s.cam_url} type={s.cam_type} spotName={s.name} />
+            <VideoPlayer
+              src={s.cam_url}
+              type={s.cam_type}
+              spotName={s.name}
+              controls={false}
+            />
           </div>
         )
       })}

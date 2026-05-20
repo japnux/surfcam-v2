@@ -8,9 +8,11 @@ interface VideoPlayerProps {
   src: string
   type: string
   spotName: string
+  /** Affiche les contrôles natifs de la vidéo (défaut: true) */
+  controls?: boolean
 }
 
-export function VideoPlayer({ src, type, spotName }: VideoPlayerProps) {
+export function VideoPlayer({ src, type, spotName, controls = true }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -157,7 +159,7 @@ export function VideoPlayer({ src, type, spotName }: VideoPlayerProps) {
             muted
             playsInline
             loop
-            controls
+            controls={controls}
             crossOrigin="anonymous"
             aria-label={`Webcam en direct de ${spotName}`}
           />
