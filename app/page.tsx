@@ -59,7 +59,8 @@ export default async function HomePage() {
             Consultez les conditions en temps réel et les prévisions détaillées pour les meilleurs spots de surf en France.
           </p>
           
-          <div className="max-w-xl mx-auto pt-4">
+          {/* Recherche : visible mobile uniquement — le header a déjà sa SearchBar sur desktop */}
+          <div className="max-w-xl mx-auto pt-4 md:hidden">
             <SearchBar placeholder="Rechercher un spot ou une ville..." />
           </div>
         </section>
