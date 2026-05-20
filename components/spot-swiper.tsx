@@ -3,12 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, Maximize, X } from 'lucide-react'
-import { Spot } from '@/lib/data/spots'
+import { SpotPreview } from '@/lib/data/spots'
 import { VideoPlayer } from '@/components/video-player-lazy'
 import { cn } from '@/lib/utils'
 
-interface FavoritesSwiperProps {
-  spots: Spot[]
+interface SpotSwiperProps {
+  spots: SpotPreview[]
 }
 
 // Seuil de déplacement (px) au-delà duquel un geste est considéré comme un swipe
@@ -19,8 +19,9 @@ const SWIPE_THRESHOLD = 50
 const PRELOAD_RADIUS = 1
 
 /**
- * Carrousel de spots favoris : on swipe horizontalement pour zapper
- * d'un spot à l'autre (même principe que le D-pad de l'app Android TV).
+ * Carrousel de spots : on swipe horizontalement pour zapper d'un spot
+ * à l'autre (même principe que le D-pad de l'app Android TV).
+ * Utilisé pour les favoris (connecté) et les spots proches (non connecté).
  *
  * Préchargement : les players des spots adjacents (±1) restent montés
  * mais masqués, leur flux HLS est donc déjà chaud au moment du swipe.
@@ -33,7 +34,7 @@ const PRELOAD_RADIUS = 1
  * élément non-vidéo) on retombe sur un overlay CSS plein écran, et
  * l'utilisateur tourne son téléphone (le layout s'adapte).
  */
-export function FavoritesSwiper({ spots }: FavoritesSwiperProps) {
+export function SpotSwiper({ spots }: SpotSwiperProps) {
   const [index, setIndex] = useState(0)
   const [immersive, setImmersive] = useState(false)
   const touchStartX = useRef<number | null>(null)

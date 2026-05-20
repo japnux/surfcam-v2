@@ -1,8 +1,8 @@
 import { Metadata } from 'next'
 import { getActiveSpots, type Spot, type SpotPreview } from '@/lib/data/spots'
 import { getUserFavorites } from '@/lib/data/favorites'
-import { SpotCard } from '@/components/spot-card'
-import { FavoritesSwiper } from '@/components/favorites-swiper'
+import { SpotSwiper } from '@/components/spot-swiper'
+import { NearbySpotsSwiper } from '@/components/nearby-spots-swiper'
 import { SearchBar } from '@/components/search-bar'
 import { config } from '@/lib/config'
 import { createClient } from '@/lib/supabase/server'
@@ -19,8 +19,9 @@ export default async function HomePage() {
   const { data: { user } } = await supabase.auth.getUser()
   
   let favoriteSpots: Spot[] = []
-  const activeSpots: SpotPreview[] = await getActiveSpots(config.homeSpotCount)
-  
+  // Tous les spots actifs : le tri par distance se fait côté client
+  const activeSpots: SpotPreview[] = await getActiveSpots()
+
   if (user) {
     // Si l'utilisateur est connecté, récupérer ses favoris actifs
     favoriteSpots = await getUserFavorites(user.id, true)
@@ -65,29 +66,15 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Spots actifs ou favoris selon l'état de connexion */}
+        {/* Favoris (connecté) ou spots proches triés par distance (visiteur) */}
         <section className="space-y-4">
           {user && favoriteSpots.length > 0 ? (
             <>
               <h2 className="text-2xl font-bold">Mes spots favoris</h2>
-              <FavoritesSwiper spots={favoriteSpots} />
+              <SpotSwiper spots={favoriteSpots} />
             </>
           ) : (
-            <>
-              <h2 className="text-2xl font-bold">Spots actifs</h2>
-
-              {activeSpots.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <p>Aucun spot disponible pour le moment.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {activeSpots.map((spot) => (
-                    <SpotCard key={spot.id} spot={spot} />
-                  ))}
-                </div>
-              )}
-            </>
+            <NearbySpotsSwiper spots={activeSpots} />
           )}
         </section>
       </div>
