@@ -1,10 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { debounce } from '@/lib/utils'
 
 interface SearchBarProps {
   onSearch?: (query: string) => void
@@ -12,42 +11,33 @@ interface SearchBarProps {
   initialValue?: string
 }
 
-export function SearchBar({ onSearch, placeholder = 'Rechercher un spot...', initialValue = '' }: SearchBarProps) {
+/**
+ * Champ de recherche : la recherche ne se déclenche qu'à la validation
+ * du champ (touche Entrée / soumission du formulaire), pas à la frappe.
+ */
+export function SearchBar({
+  onSearch,
+  placeholder = 'Rechercher un spot...',
+  initialValue = '',
+}: SearchBarProps) {
   const [query, setQuery] = useState(initialValue)
-  const [isSearching, setIsSearching] = useState(false)
   const router = useRouter()
 
-  useEffect(() => {
-    const debouncedSearch = debounce(async (searchQuery: string) => {
-      if (!searchQuery || searchQuery.length < 2) {
-        return
-      }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const q = query.trim()
+    if (q.length < 2) return
 
-      setIsSearching(true)
-
-      try {
-        if (onSearch) {
-          onSearch(searchQuery)
-        } else {
-          // Rediriger vers la page de résultats unifiée
-          router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
-        }
-      } catch (error) {
-        console.error('Erreur lors de la recherche:', error)
-        router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
-      } finally {
-        setIsSearching(false)
-      }
-    }, 500)
-
-    if (query !== initialValue && query.length >= 2) {
-      debouncedSearch(query)
+    if (onSearch) {
+      onSearch(q)
+    } else {
+      router.push(`/search?q=${encodeURIComponent(q)}`)
     }
-  }, [query, onSearch, router, initialValue])
+  }
 
   return (
-    <div className="relative">
-      <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${isSearching ? 'text-primary animate-pulse' : 'text-muted-foreground'}`} />
+    <form onSubmit={handleSubmit} className="relative">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
       <Input
         type="search"
         placeholder={placeholder}
@@ -56,6 +46,6 @@ export function SearchBar({ onSearch, placeholder = 'Rechercher un spot...', ini
         className="pl-10"
         aria-label="Rechercher des spots de surf ou des villes"
       />
-    </div>
+    </form>
   )
 }

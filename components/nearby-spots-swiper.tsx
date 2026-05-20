@@ -73,7 +73,7 @@ export function NearbySpotsSwiper({ spots }: NearbySpotsSwiperProps) {
   if (spots.length === 0) {
     return (
       <>
-        <h2 className="text-2xl font-bold">Spots actifs</h2>
+        <h2 className="text-2xl font-bold">Spots les plus proches</h2>
         <div className="text-center py-12 text-muted-foreground">
           <p>Aucun spot disponible pour le moment.</p>
         </div>
@@ -83,9 +83,7 @@ export function NearbySpotsSwiper({ spots }: NearbySpotsSwiperProps) {
 
   return (
     <>
-      <h2 className="text-2xl font-bold">
-        {status === 'located' ? 'Spots les plus proches' : 'Spots actifs'}
-      </h2>
+      <h2 className="text-2xl font-bold">Spots les plus proches</h2>
 
       {status === 'locating' ? (
         <div className="mx-auto max-w-5xl">
