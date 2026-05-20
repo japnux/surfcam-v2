@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { getActiveSpots, type Spot, type SpotPreview } from '@/lib/data/spots'
 import { getUserFavorites } from '@/lib/data/favorites'
 import { SpotCard } from '@/components/spot-card'
-import { FavoriteSpotCard } from '@/components/favorite-spot-card'
+import { FavoritesSwiper } from '@/components/favorites-swiper'
 import { SearchBar } from '@/components/search-bar'
 import { config } from '@/lib/config'
 import { createClient } from '@/lib/supabase/server'
@@ -69,11 +69,7 @@ export default async function HomePage() {
           {user && favoriteSpots.length > 0 ? (
             <>
               <h2 className="text-2xl font-bold">Mes spots favoris</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {favoriteSpots.map((spot) => (
-                  <FavoriteSpotCard key={spot.id} spot={spot} />
-                ))}
-              </div>
+              <FavoritesSwiper spots={favoriteSpots} />
             </>
           ) : (
             <>

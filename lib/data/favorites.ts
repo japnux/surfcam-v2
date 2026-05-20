@@ -7,7 +7,7 @@ export async function getUserFavorites(userId: string, activeOnly: boolean = fal
   // Optimisation: sélectionner uniquement les champs nécessaires
   let query = supabase
     .from('favorites')
-    .select('spot_id, spots(id, name, slug, cam_url, cam_type)')
+    .select('spot_id, spots(id, name, slug, cam_url, cam_type, break_type, level)')
     .eq('user_id', userId)
   
   if (activeOnly) {
