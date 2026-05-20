@@ -132,55 +132,6 @@ export type Database = {
           created_at?: string | null
         }
       }
-      spot_comments: {
-        Row: {
-          id: string
-          spot_id: string
-          user_id: string
-          content: string
-          is_archived: boolean
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          spot_id: string
-          user_id: string
-          content: string
-          is_archived?: boolean
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          spot_id?: string
-          user_id?: string
-          content?: string
-          is_archived?: boolean
-          created_at?: string | null
-          updated_at?: string | null
-        }
-      }
-      comment_votes: {
-        Row: {
-          comment_id: string
-          user_id: string
-          vote_type: number
-          created_at: string | null
-        }
-        Insert: {
-          comment_id: string
-          user_id: string
-          vote_type: number
-          created_at?: string | null
-        }
-        Update: {
-          comment_id?: string
-          user_id?: string
-          vote_type?: number
-          created_at?: string | null
-        }
-      }
       spot_forecast_cache: {
         Row: {
           id: string
